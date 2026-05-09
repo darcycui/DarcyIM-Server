@@ -27,4 +27,8 @@ class OneTimePreKeyService @Autowired constructor(
     fun queryByUserId(userId: Long): List<OneTimePreKey> {
         return oneTimePreKeyRepository.findByUserId(userId)
     }
+
+    fun queryFirstEnabledOneTimePreKey(userId: Long): OneTimePreKey? {
+        return oneTimePreKeyRepository.findFirstByUserIdAndIsUsedFalse(userId)
+    }
 }
