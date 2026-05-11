@@ -63,12 +63,29 @@ class RegisterTests {
         roles = "admin",
         token = "",
     )
+    private val user2 = User(
+        username = "Bob$userCount",
+        passwordHash = "123456",
+        nickname = "Bob$userCount",
+        avatar = "https://c-ssl.dtstatic.com/uploads/blog/202012/04/20201204130014_e1b21.thumb.200_0.png",
+        phone = "${188000111222 + userCount}",
+        email = "Bob$userCount@gmail.com",
+        gender = "male",
+        signature = "I'm the other test user",
+        status = UserStatus.NORMAL,
+        lastActiveTime = null,
+        deletedAt = null,
+        settings = emptyMap(),
+        roles = "admin",
+        token = "",
+    )
 
     private val alice = Alice()
 
     @Test
     fun `test-register`() {
-        val user = user1
+//        val user = user1
+        val user = user2
         user.createdAt = LocalDateTime.now()
         println("createAt: ${user.createdAt}")
         user.updatedAt = LocalDateTime.now()
