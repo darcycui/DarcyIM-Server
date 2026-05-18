@@ -1,8 +1,10 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
 import com.alibaba.fastjson2.JSON
+import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
 import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.X3DHKeysPullDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.X3DHKeysPushDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.toDTOList
 import com.darcy.kotlin.server.demowebsocket.domain.table.x3dh.HelloMessage
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
@@ -68,7 +70,8 @@ class X3DHService @Autowired constructor(
         return X3DHKeysPullDTO(
             identityKey.publicKey,
             signedPreKey.publicKey,
-            oneTimePreKey.publicKey
+            oneTimePreKey.publicKey,
+            oneTimePreKeyIndex = oneTimePreKey.id
         )
     }
 
@@ -77,7 +80,7 @@ class X3DHService @Autowired constructor(
         toUserId: Long,
         aliceIdentityKey: String,
         aliceEphemeralKey: String,
-        bobOneTimePreKeyId: Int
+        bobOneTimePreKeyId: Long
     ): HelloMessage {
         if (userService.isUserExistById(fromUserId).not() || userService.isUserExistById(toUserId).not()) {
             throw UserException.USER_NOT_EXIST
@@ -94,7 +97,7 @@ class X3DHService @Autowired constructor(
         return helloMessageService.createHelloMessage(helloMessage)
     }
 
-    fun queryHelloMessage(fromUserId: Long, toUserId: Long): HelloMessage? {
+    fun queryHelloMessage(fromUserId: Long, toUserId: Long): List<HelloMessage> {
         if (userService.isUserExistById(fromUserId).not() || userService.isUserExistById(toUserId).not()) {
             throw UserException.USER_NOT_EXIST
         }

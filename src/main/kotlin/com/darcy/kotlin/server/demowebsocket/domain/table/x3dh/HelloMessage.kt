@@ -33,7 +33,7 @@ open class HelloMessage(
     open var aliceEphemeralKey: String = "",
 
     @Column(name = "bob_one_time_pre_key")
-    open var bobOneTimePreKeyIndex: Int = 0,
+    open var bobOneTimePreKeyIndex: Long = 0,
 ) : BaseEntity() {
 
 }

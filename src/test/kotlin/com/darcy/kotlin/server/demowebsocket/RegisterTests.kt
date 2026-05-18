@@ -80,8 +80,6 @@ class RegisterTests {
         token = "",
     )
 
-    private val alice = Alice()
-
     @Test
     fun `test-register`() {
 //        val user = user1
@@ -112,9 +110,6 @@ class RegisterTests {
                 .param("token", user.token)
                 .param("createdAt", user.createdAt.toString())
                 .param("updatedAt", user.updatedAt.toString())
-                .param("identityKey", alice.getIdentityPublicKey().keyToString())
-                .param("signedPreKey", alice.getSignedPreKeyPublicKey().keyToString())
-                .param("oneTimePreKeys", alice.getOneTimePreKeyPublicKeyList().keysToString())
         )
             .andExpect(status().isOk)
             .andReturn()

@@ -13,7 +13,7 @@ class HelloMessageService @Autowired constructor(
         return helloMessageRepository.save(helloMessage)
     }
 
-    fun queryHelloMessage(fromUserId: Long, toUserId: Long): HelloMessage? {
+    fun queryHelloMessage(fromUserId: Long, toUserId: Long): List<HelloMessage> {
         return helloMessageRepository.findByUserId(fromUserId, toUserId)
     }
 }
