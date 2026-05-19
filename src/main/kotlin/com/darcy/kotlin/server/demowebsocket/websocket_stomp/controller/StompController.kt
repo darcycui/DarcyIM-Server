@@ -2,17 +2,13 @@ package com.darcy.kotlin.server.demowebsocket.websocket_stomp.controller
 
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
-import com.darcy.kotlin.server.demowebsocket.domain.dto.message.toEntity
 import com.darcy.kotlin.server.demowebsocket.exception.code1000.X3DHException
-import com.darcy.kotlin.server.demowebsocket.http.service.PrivateMessageService
-import com.darcy.kotlin.server.demowebsocket.http.service.UserService
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.api.IStomp
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.service.STOMPService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Controller
 
 @Controller
@@ -23,8 +19,11 @@ class StompController @Autowired constructor(
         DarcyLogger.info("private message=$privateMessage")
         val sender = sha.user?.name ?: ""
         DarcyLogger.info("private sender: $sender message=$privateMessage")
-        val dhPublicKey = sha.getFirstNativeHeader("dhPublicKey") ?: throw X3DHException.DH_KEY_NOT_EXIST
-        stompService.sendPrivate(privateMessage, dhPublicKey)
+        val dhPublicKey = sha.getFirstNativeHeader("dhPublicKey") ?: throw X3DHException.DH_KEY_HEADER_NOT_EXIST
+        val fromUserId = sha.getFirstNativeHeader("fromUserId") ?: throw X3DHException.FROM_USER_ID_HEADER_NOT_EXIST
+        val sendingIndex = sha.getFirstNativeHeader("sendingIndex")?.toLongOrNull() ?: throw X3DHException.SENDING_INDEX_HEADER_NOT_EXIST
+        val receivingIndex = sha.getFirstNativeHeader("receivingIndex")?.toLongOrNull() ?: throw X3DHException.RECEIVING_INDEX_HEADER_NOT_EXIST
+        stompService.sendPrivate(privateMessage, fromUserId, dhPublicKey, sendingIndex, receivingIndex)
     }
 
     override fun sendAllGroup(sha: SimpMessageHeaderAccessor, @Payload groupMessage: GroupMessageDTO) {

@@ -1,5 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.OneTimePreKeyInputDTO
 import com.darcy.kotlin.server.demowebsocket.domain.table.x3dh.OneTimePreKey
 import com.darcy.kotlin.server.demowebsocket.exception.code1000.X3DHException
 import com.darcy.kotlin.server.demowebsocket.http.repository.IdentityKeyRepository
@@ -15,12 +16,13 @@ class OneTimePreKeyService @Autowired constructor(
     private val oneTimePreKeyRepository: OneTimePreKeyRepository,
     private val userService: UserService,
 ) {
-    fun createOneTimePreKeys(userId: Long, publicKeys: List<String>): List<OneTimePreKey> {
+    fun createOneTimePreKeys(userId: Long, publicKeys: List<OneTimePreKeyInputDTO>): List<OneTimePreKey> {
         val user = userService.queryUserById(userId)
         val oneTimePreKeys = publicKeys.map {
             OneTimePreKey(
+                keyId = it.keyId,
                 user = user,
-                publicKey = it
+                publicKey = it.publicKey
             )
         }
         return oneTimePreKeyRepository.saveAll(oneTimePreKeys)

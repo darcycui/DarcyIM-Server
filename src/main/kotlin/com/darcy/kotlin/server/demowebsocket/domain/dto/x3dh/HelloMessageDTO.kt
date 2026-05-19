@@ -14,6 +14,7 @@ data class HelloMessageDTO(
     val toUserId: Long = 0,
     val aliceIdentityKey: String = "",
     val aliceEphemeralKey: String = "",
+    val bobOneTimePreKeyId: String = "",
     val createdAt: LocalDateTime? = null,
     val updatedAt: LocalDateTime? = null
 )
@@ -28,6 +29,7 @@ fun HelloMessage.toDTO(): HelloMessageDTO {
         toUserId = this.toUser.id,
         aliceIdentityKey = this.aliceIdentityKey,
         aliceEphemeralKey = this.aliceEphemeralKey,
+        bobOneTimePreKeyId = this.bobOneTimePreKeyId,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )
@@ -43,7 +45,9 @@ fun HelloMessageDTO.toEntity(fromUser: User, toUser: User): HelloMessage {
         fromUser = fromUser,
         toUser = toUser,
         aliceIdentityKey = this.aliceIdentityKey,
-        aliceEphemeralKey = this.aliceEphemeralKey
+        aliceEphemeralKey = this.aliceEphemeralKey,
+        bobOneTimePreKeyId = this.bobOneTimePreKeyId
+
     )
 }
 

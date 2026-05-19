@@ -75,7 +75,7 @@ class X3DHTests {
                 .param("bobUserId", "14")
                 .param("aliceIdentityKey", "alicekey1")
                 .param("aliceEphemeralKey", "alicekey2")
-                .param("bobOneTimePreKeyIndex", "301")
+                .param("bobOneTimePreKeyId", "uuid:xxxyyyxxx")
         )
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andReturn()

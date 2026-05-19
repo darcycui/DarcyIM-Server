@@ -15,8 +15,18 @@ class FriendshipService @Autowired constructor(
     fun createFriendship(userId: Long, friendId: Long): List<Friendship> {
         val user = userService.queryUserById(userId)
         val friend = userService.queryUserById(friendId)
-        val result1 = friendshipRepository.save(Friendship(user, friend))
-        val result2 = friendshipRepository.save(Friendship(friend, user))
+        val result1 = friendshipRepository.save(
+            Friendship(
+                user, friend,
+                relationStatus = Friendship.RelationStatus.FRIEND
+            )
+        )
+        val result2 = friendshipRepository.save(
+            Friendship(
+                friend, user,
+                relationStatus = Friendship.RelationStatus.FRIEND
+            )
+        )
         return listOf(result1, result2)
     }
 

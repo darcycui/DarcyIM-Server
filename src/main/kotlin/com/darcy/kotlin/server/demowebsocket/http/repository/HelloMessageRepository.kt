@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.Query
 
 interface HelloMessageRepository : JpaRepository<HelloMessage, Long> {
     @Query("SELECT h FROM HelloMessage h WHERE h.fromUser.id = :fromUserId AND h.toUser.id = :toUserId")
-    fun findByUserId(fromUserId: Long, toUserId: Long): List<HelloMessage>
+    fun findByUserId(fromUserId: Long, toUserId: Long): HelloMessage?
 }

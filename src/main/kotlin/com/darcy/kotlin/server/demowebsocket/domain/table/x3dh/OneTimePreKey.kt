@@ -32,6 +32,9 @@ open class OneTimePreKey(
     @JoinColumn(name = "user_id", nullable = false, foreignKey = ForeignKey(name = "fk_onetime_prekey_user"))
     open var user: User,
 
+    @Column(name = "key_id", nullable = false, length = 64)
+    open var keyId: String,
+
     @Column(name = "public_key", nullable = false, length = 256)
     open var publicKey: String = "",
 

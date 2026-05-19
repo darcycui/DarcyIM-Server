@@ -10,6 +10,7 @@ import java.time.LocalDateTime
  */
 data class OneTimePreKeyDTO(
     val id: Long = 0,
+    val keyId: String = "",
     val userId: Long = 0,
     val publicKey: String = "",
     val isUsed: Boolean = false,
@@ -48,6 +49,7 @@ fun OneTimePreKey.toDTO(): OneTimePreKeyDTO {
  */
 fun OneTimePreKeyDTO.toEntity(user: User, device: Device): OneTimePreKey {
     return OneTimePreKey(
+        keyId = this.keyId,
         user = user,
         publicKey = this.publicKey,
         isUsed = this.isUsed,

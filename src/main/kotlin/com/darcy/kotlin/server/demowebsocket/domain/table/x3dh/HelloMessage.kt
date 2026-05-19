@@ -10,8 +10,6 @@ import jakarta.persistence.*
     indexes = [
         Index(name = "idx_from_user_id", columnList = "from_user_id"),
         Index(name = "idx_to_user_id", columnList = "to_user_id"),
-        Index(name = "idx_created", columnList = "created_at"),
-        Index(name = "idx_expires", columnList = "expires_at"),
     ],
     uniqueConstraints = [
         UniqueConstraint(name = "uk_from_to_user", columnNames = ["from_user_id", "to_user_id"])
@@ -32,8 +30,8 @@ open class HelloMessage(
     @Column(name = "alice_ephemeral_key", nullable = false, length = 256)
     open var aliceEphemeralKey: String = "",
 
-    @Column(name = "bob_one_time_pre_key")
-    open var bobOneTimePreKeyIndex: Long = 0,
+    @Column(name = "bob_one_time_pre_key", nullable = false, length = 64)
+    open var bobOneTimePreKeyId: String = "",
 ) : BaseEntity() {
 
 }

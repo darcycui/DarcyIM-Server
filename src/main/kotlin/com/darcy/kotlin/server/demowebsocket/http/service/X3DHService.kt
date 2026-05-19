@@ -1,12 +1,12 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
 import com.alibaba.fastjson2.JSON
-import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.OneTimePreKeyInputDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.X3DHKeysPullDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.X3DHKeysPushDTO
-import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.toDTOList
 import com.darcy.kotlin.server.demowebsocket.domain.table.x3dh.HelloMessage
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
+import com.darcy.kotlin.server.demowebsocket.exception.code1000.X3DHException
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -40,7 +40,7 @@ class X3DHService @Autowired constructor(
         val identityKey = identityKeyService.createIdentityKey(userId, identityKeyStr)
         val signedPreKey = signedPreKeyService.createSignedPreKey(userId, signedPreKeyStr)
         val oneTimePreKeyList = try {
-            JSON.parseArray(oneTimePreKeysStr, String::class.java)
+            JSON.parseArray(oneTimePreKeysStr,  OneTimePreKeyInputDTO::class.java)
         } catch (e: Exception) {
             DarcyLogger.error("解析 oneTimePreKeys 失败: ${e.message}", e)
             emptyList()
@@ -60,7 +60,7 @@ class X3DHService @Autowired constructor(
     }
 
 
-    fun queryPublicKeys(aliceUserId: Long, bobUserId: Long): X3DHKeysPullDTO {
+    fun queryUserKeys(aliceUserId: Long, bobUserId: Long): X3DHKeysPullDTO {
         if (userService.isUserExistById(aliceUserId).not() || userService.isUserExistById(bobUserId).not()) {
             throw UserException.USER_NOT_EXIST
         }
@@ -71,7 +71,7 @@ class X3DHService @Autowired constructor(
             identityKey.publicKey,
             signedPreKey.publicKey,
             oneTimePreKey.publicKey,
-            oneTimePreKeyIndex = oneTimePreKey.id
+            oneTimePreKeyId = oneTimePreKey.keyId
         )
     }
 
@@ -80,7 +80,7 @@ class X3DHService @Autowired constructor(
         toUserId: Long,
         aliceIdentityKey: String,
         aliceEphemeralKey: String,
-        bobOneTimePreKeyId: Long
+        bobOneTimePreKeyId: String
     ): HelloMessage {
         if (userService.isUserExistById(fromUserId).not() || userService.isUserExistById(toUserId).not()) {
             throw UserException.USER_NOT_EXIST
@@ -92,15 +92,17 @@ class X3DHService @Autowired constructor(
             toUser = toUser,
             aliceIdentityKey = aliceIdentityKey,
             aliceEphemeralKey = aliceEphemeralKey,
-            bobOneTimePreKeyIndex = bobOneTimePreKeyId
+            bobOneTimePreKeyId = bobOneTimePreKeyId
         )
         return helloMessageService.createHelloMessage(helloMessage)
     }
 
-    fun queryHelloMessage(fromUserId: Long, toUserId: Long): List<HelloMessage> {
+    fun queryHelloMessage(fromUserId: Long, toUserId: Long): HelloMessage {
         if (userService.isUserExistById(fromUserId).not() || userService.isUserExistById(toUserId).not()) {
             throw UserException.USER_NOT_EXIST
         }
-        return helloMessageService.queryHelloMessage(fromUserId, toUserId)
+        val helloMessage = helloMessageService.queryHelloMessage(fromUserId, toUserId)
+            ?: throw X3DHException.HELLO_MESSAGE_NOT_EXIST
+        return helloMessage
     }
 }

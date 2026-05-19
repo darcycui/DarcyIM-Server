@@ -23,12 +23,31 @@ class STOMPService @Autowired constructor(
 //    @Lazy
 //    private val simpUserRegistry: SimpUserRegistry
 ) {
-    fun sendPrivate(privateMessage: PrivateMessageDTO, dhPublicKey: String) {
+    fun sendPrivate(
+        privateMessage: PrivateMessageDTO,
+        fromUserId: String,
+        dhPublicKey: String,
+        sendingIndex: Long,
+        receivingIndex: Long
+    ) {
         val recipient = privateMessage.receiverName
         kotlin.runCatching {
-            DarcyLogger.warn("单发消息 -->$recipient $privateMessage")
+            val headers =
+                mapOf(
+                    "fromUserId" to fromUserId,
+                    "dhPublicKey" to dhPublicKey,
+                    "sendingIndex" to sendingIndex,
+                    "receivingIndex" to receivingIndex,
+                )
+            DarcyLogger.warn("单发消息 -->$recipient")
+            DarcyLogger.warn("单发消息 -->message=$privateMessage")
+            DarcyLogger.warn("单发消息 -->headers=$headers")
             // Spring STOMP 单播 Unicast
-            websocket.convertAndSendToUser(recipient, "/queue/message", privateMessage)
+            websocket.convertAndSendToUser(
+                recipient,
+                "/queue/message",
+                privateMessage,
+            )
             val sendUser = userService.queryUserById(privateMessage.senderId)
             val receiveUser = userService.queryUserById(privateMessage.receiverId)
             privateMessageService.createMessage(privateMessage.toEntity(sendUser, receiveUser))
