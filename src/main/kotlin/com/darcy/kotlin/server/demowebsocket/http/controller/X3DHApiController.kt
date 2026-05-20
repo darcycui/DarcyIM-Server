@@ -54,7 +54,7 @@ class X3DHApiController @Autowired constructor(
             aliceEphemeralKey,
             bobOneTimePreKeyId
         )
-        return ResultEntity.success(result).toJsonString()
+        return ResultEntity.success(result.toDTO()).toJsonString()
     }
 
     override fun pullAliceHello(params: Map<String, String>): String {
