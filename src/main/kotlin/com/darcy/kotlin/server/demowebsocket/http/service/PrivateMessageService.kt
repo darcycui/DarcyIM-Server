@@ -8,6 +8,7 @@ import com.darcy.kotlin.server.demowebsocket.http.repository.PrivateMessageRepos
 import com.darcy.kotlin.server.demowebsocket.utils.IdGenerator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -77,8 +78,10 @@ class PrivateMessageService @Autowired constructor(
         val senderId = conversation.user.id
         val receiverId = conversation.targetId
         val pageable = PageRequest.of(page, size)
-        return privateMessageRepository.findBothMessagesPage(senderId, receiverId, pageable)
-
+        val result =  privateMessageRepository.findBothMessagesPage(senderId, receiverId, pageable)
+        val reversedContent = result.content.reversed()
+        val reversedResult = PageImpl(reversedContent, result.pageable, result.totalElements)
+        return reversedResult
         // 获取分页数据 result
         // result.content  // 当前页的消息列表
         // result.totalPages  // 总页数
