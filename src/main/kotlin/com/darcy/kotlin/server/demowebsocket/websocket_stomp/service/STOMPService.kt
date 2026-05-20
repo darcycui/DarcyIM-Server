@@ -47,6 +47,7 @@ class STOMPService @Autowired constructor(
                 recipient,
                 "/queue/message",
                 privateMessage,
+                headers
             )
             val sendUser = userService.queryUserById(privateMessage.senderId)
             val receiveUser = userService.queryUserById(privateMessage.receiverId)
