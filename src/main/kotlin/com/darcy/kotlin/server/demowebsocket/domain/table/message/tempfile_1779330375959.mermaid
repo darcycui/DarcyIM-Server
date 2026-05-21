@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Sender as 发送方
+    participant Server as 服务器
+    participant DB as 数据库
+    participant Receiver as 接收方
+
+    Sender->>Server: 发送消息 (STOMP)
+    Server->>DB: 保存消息
+    Server->>DB: 创建已读状态(is_read=false)
+    Server->>Receiver: 推送消息
+    
+    Receiver->>Server: 查看消息
+    Receiver->>Server: 发送已读回执 (HTTP POST)
+    Server->>DB: 更新已读状态(is_read=true)
+    Server->>Sender: 推送已读通知 (STOMP)
+    Sender->>Sender: 显示"已读"标识

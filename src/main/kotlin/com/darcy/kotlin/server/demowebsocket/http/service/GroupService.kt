@@ -101,4 +101,8 @@ class GroupService @Autowired constructor(
         conversationService.createConversation(inviteeId, Conversation.ConversationType.GROUP, groupId)
         return result
     }
+
+    fun queryAllGroupMembersById(groupId: Long): List<GroupMember> {
+        return groupMemberService.queryGroupMembers(groupId)
+    }
 }

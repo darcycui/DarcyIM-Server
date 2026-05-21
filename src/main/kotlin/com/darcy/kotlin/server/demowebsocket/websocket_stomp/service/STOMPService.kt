@@ -3,11 +3,9 @@ package com.darcy.kotlin.server.demowebsocket.websocket_stomp.service
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.toEntity
+import com.darcy.kotlin.server.demowebsocket.domain.table.conversation.Conversation
 import com.darcy.kotlin.server.demowebsocket.exception.code800.STOMPException
-import com.darcy.kotlin.server.demowebsocket.http.service.GroupMessageService
-import com.darcy.kotlin.server.demowebsocket.http.service.GroupService
-import com.darcy.kotlin.server.demowebsocket.http.service.PrivateMessageService
-import com.darcy.kotlin.server.demowebsocket.http.service.UserService
+import com.darcy.kotlin.server.demowebsocket.http.service.*
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -20,6 +18,7 @@ class STOMPService @Autowired constructor(
     private val groupMessageService: GroupMessageService,
     private val groupService: GroupService,
     private val userService: UserService,
+    private val messageReadStatusService: MessageReadStatusService
 //    @Lazy
 //    private val simpUserRegistry: SimpUserRegistry
 ) {
@@ -39,19 +38,27 @@ class STOMPService @Autowired constructor(
                     "sendingIndex" to sendingIndex,
                     "receivingIndex" to receivingIndex,
                 )
-            DarcyLogger.warn("单发消息 -->$recipient")
-            DarcyLogger.warn("单发消息 -->message=$privateMessage")
-            DarcyLogger.warn("单发消息 -->headers=$headers")
+            val sendUser = userService.queryUserById(privateMessage.senderId)
+            val receiveUser = userService.queryUserById(privateMessage.receiverId)
+            val savedMessage = privateMessageService.createMessage(privateMessage.toEntity(sendUser, receiveUser))
+            DarcyLogger.info("保存消息: msgId=${savedMessage.msgId} receiverId=${privateMessage.receiverId}")
+            messageReadStatusService.createOrUpdateReadStatus(
+                msgId = savedMessage.msgId,
+                userId = privateMessage.receiverId,
+                conversationType = Conversation.ConversationType.PRIVATE,
+                targetId = privateMessage.senderId,
+                isRead = false
+            )
+            DarcyLogger.info("创建消息已读状态: msgId=${savedMessage.msgId}, receiverId=${privateMessage.receiverId}")
+            DarcyLogger.warn("单发消息 -->$recipient headers=$headers message=$privateMessage")
             // Spring STOMP 单播 Unicast
             websocket.convertAndSendToUser(
                 recipient,
                 "/queue/message",
-                privateMessage,
+                privateMessage.copy(msgId = savedMessage.msgId),
                 headers
             )
-            val sendUser = userService.queryUserById(privateMessage.senderId)
-            val receiveUser = userService.queryUserById(privateMessage.receiverId)
-            privateMessageService.createMessage(privateMessage.toEntity(sendUser, receiveUser))
+
         }.onSuccess {
             DarcyLogger.info("send private message SUCCESS")
         }.onFailure {
@@ -84,7 +91,22 @@ class STOMPService @Autowired constructor(
             websocket.convertAndSend("/topic/message", groupMessage)
             val sender = userService.queryUserById(groupMessage.senderId)
             val group = groupService.queryGroupById(groupMessage.groupId)
-            groupMessageService.createMessage(groupMessage.toEntity(sender, group))
+            val savedMessage = groupMessageService.createMessage(groupMessage.toEntity(sender, group))
+            val members = groupService.queryAllGroupMembersById(groupMessage.groupId)
+            members.forEach { member ->
+                if (member.id != groupMessage.senderId) {
+                    messageReadStatusService.createOrUpdateReadStatus(
+                        msgId = savedMessage.msgId,
+                        userId = member.id,
+                        conversationType = Conversation.ConversationType.GROUP,
+                        targetId = groupMessage.groupId,
+                        isRead = false
+                    )
+                }
+            }
+
+            DarcyLogger.info("创建群消息已读状态: msgId=${savedMessage.msgId}, memberCount=${members.size}")
+
         }.onSuccess {
             DarcyLogger.info("send all group message SUCCESS")
         }.onFailure {
@@ -102,7 +124,19 @@ class STOMPService @Autowired constructor(
             websocket.convertAndSend("/topic/group/$groupId", groupMessage)
             val sender = userService.queryUserById(groupMessage.senderId)
             val group = groupService.queryGroupById(groupMessage.groupId)
-            groupMessageService.createMessage(groupMessage.toEntity(sender, group))
+            val savedMessage = groupMessageService.createMessage(groupMessage.toEntity(sender, group))
+            val members = groupService.queryAllGroupMembersById(groupId)
+            members.forEach { member ->
+                if (member.id != groupMessage.senderId) {
+                    messageReadStatusService.createOrUpdateReadStatus(
+                        msgId = savedMessage.msgId,
+                        userId = member.id,
+                        conversationType = Conversation.ConversationType.GROUP,
+                        targetId = groupId,
+                        isRead = false
+                    )
+                }
+            }
         }.onSuccess {
             DarcyLogger.info("send target group message SUCCESS")
         }.onFailure {

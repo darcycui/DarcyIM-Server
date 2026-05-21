@@ -7,15 +7,15 @@ import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil
 import org.springframework.data.domain.Page
 
 data class MessageReadStatusDTO(
+    val id: Long = 0,
     val msgId: String = "",
-    val userId: Long,
-    val conversationType: Int,
+    val userId: Long = 0,
+    val conversationType: Int = 1,
     val targetId: Long = 0L,
     val isRead: Boolean = false,
     val readTime: String = "",
     val clientType: String = "",
     val deviceId: String = "",
-    val id: Long = 0,
     val createdAt: String = "",
     val updatedAt: String = ""
 )

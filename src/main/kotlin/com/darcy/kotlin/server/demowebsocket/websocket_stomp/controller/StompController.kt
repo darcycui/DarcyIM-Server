@@ -1,19 +1,25 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.controller
 
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.MessageReadStatusInputDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.message.MessageReadStatusDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.exception.code1000.X3DHException
+import com.darcy.kotlin.server.demowebsocket.http.service.MessageReadStatusService
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.api.IStomp
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.service.STOMPService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Controller
 
 @Controller
 class StompController @Autowired constructor(
-    private val stompService: STOMPService
+    private val stompService: STOMPService,
+    private val messageReadStatusService: MessageReadStatusService,
+    private val websocket: SimpMessagingTemplate
 ) : IStomp {
     override fun sendPrivate(sha: SimpMessageHeaderAccessor, @Payload privateMessage: PrivateMessageDTO) {
         DarcyLogger.info("private message=$privateMessage")
@@ -38,5 +44,17 @@ class StompController @Autowired constructor(
         val sender = sha.user?.name ?: ""
         DarcyLogger.info("target group sender: $sender message=$groupMessage")
         stompService.sendTargetGroup(groupMessage)
+    }
+
+    override fun markMessageRead(sha: SimpMessageHeaderAccessor, messageReadStatusInputDTO: MessageReadStatusInputDTO) {
+        val updatedCount = messageReadStatusService.markMessagesAsRead(messageReadStatusInputDTO.userId, messageReadStatusInputDTO.msgIds)
+        val result = messageReadStatusInputDTO.msgIds.mapNotNull {
+            messageReadStatusService.getMessageReadStatus(it, messageReadStatusInputDTO.userId)
+        }
+        websocket.convertAndSendToUser(
+            messageReadStatusInputDTO.targetName,
+            "/queue/message/read",
+            result
+        )
     }
 }

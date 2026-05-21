@@ -1,5 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.api
 
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.MessageReadStatusInputDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -18,4 +19,7 @@ interface IStomp {
 
     @MessageMapping("/sendTargetGroupMessage")
     fun sendTargetGroup(sha: SimpMessageHeaderAccessor, @Payload groupMessage: GroupMessageDTO)
+
+    @MessageMapping("/markMessageRead")
+    fun markMessageRead(sha: SimpMessageHeaderAccessor, @Payload messageReadStatusInputDTO: MessageReadStatusInputDTO)
 }
