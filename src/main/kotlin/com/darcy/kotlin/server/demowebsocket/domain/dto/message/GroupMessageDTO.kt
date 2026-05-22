@@ -3,7 +3,7 @@ package com.darcy.kotlin.server.demowebsocket.domain.dto.message
 import com.darcy.kotlin.server.demowebsocket.domain.table.User
 import com.darcy.kotlin.server.demowebsocket.domain.table.group.Group
 import com.darcy.kotlin.server.demowebsocket.domain.table.message.GroupMessage
-import com.darcy.kotlin.server.demowebsocket.utils.IdGenerator
+import com.darcy.kotlin.server.demowebsocket.utils.UUIdGenerator
 import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil
 import org.springframework.data.domain.Page
 import java.time.LocalDateTime
@@ -63,7 +63,7 @@ fun GroupMessageDTO.toEntity(
     group: Group,
 ): GroupMessage {
     return GroupMessage(
-        msgId = IdGenerator().nextGroupId(),
+        msgId = UUIdGenerator().nextGroupId(),
         group = group,
         sender = sender,
         content = this.content,

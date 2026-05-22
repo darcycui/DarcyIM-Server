@@ -64,16 +64,19 @@ class MessageReadStatusService @Autowired constructor(
         return updatedCount
     }
 
-    fun getUnreadMessageCount(userId: Long): Long {
-        return messageReadStatusRepository.countUnreadMessages(userId)
+    fun getUnreadMessagesByConversation(userId: Long, targetId: Long): MessageReadStatusDTO {
+        return messageReadStatusRepository.findUnreadMessagesByConversation(userId, targetId).toDTO()
     }
 
-    fun getUnreadMessagesByConversation(userId: Long, targetId: Long): List<MessageReadStatusDTO> {
-        return messageReadStatusRepository.findUnreadMessagesByConversation(userId, targetId)
-            .map { it.toDTO() }
+    fun getMessageReadStatus(userId: Long, msgId: String): MessageReadStatusDTO {
+        return messageReadStatusRepository.findByUserIdAndMsgId(userId, msgId).toDTO()
     }
 
-    fun getMessageReadStatus(msgId: String, userId: Long): MessageReadStatusDTO? {
-        return messageReadStatusRepository.findByUserIdAndMsgId(userId, msgId)?.toDTO()
+    fun getMessagesReadStatus(userId: Long, msgIds: List<String>): MessageReadStatusDTO {
+        return messageReadStatusRepository.findByUserIdAndMsgIds(userId, msgIds).toDTO()
+    }
+
+    fun deleteByUserIdAndTargetId(userId: Long, friendId: Long): Int {
+        return messageReadStatusRepository.deleteByUserIdAndTargetId(userId, friendId)
     }
 }

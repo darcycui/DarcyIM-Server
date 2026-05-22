@@ -18,69 +18,13 @@ interface ConversationRepository : JpaRepository<Conversation, Long> {
         targetId: Long
     ): Conversation?
 
-    fun findByUserIdOrderByLastMsgTimeDesc(userId: Long): List<Conversation>
-
-    fun findByUserIdAndIsPinnedTrueOrderByLastMsgTimeDesc(userId: Long): List<Conversation>
-
-    fun findByUserIdAndIsMutedTrue(userId: Long): List<Conversation>
-
     fun findByUserId(userId: Long): List<Conversation>
 
     @Modifying
-    @Transactional
     @Query(
-        """
-        UPDATE Conversation c SET 
-        c.unreadCount = c.unreadCount + 1, 
-        c.lastMsgId = :msgId, 
-        c.lastMsgContent = :content, 
-        c.lastMsgType = :msgType, 
-        c.lastMsgSenderId = :senderId, 
-        c.lastMsgTime = :msgTime 
-        WHERE c.user.id = :userId AND c.conversationType = :conversationType 
-        AND c.targetId = :targetId
-    """
+        "DELETE FROM Conversation c WHERE (c.user.id = :userId AND c.targetId = :targetId) " +
+                "OR (c.user.id = :targetId AND c.targetId = :userId)"
     )
-    fun updateConversationOnNewMessage(
-        @Param("userId") userId: Long,
-        @Param("conversationType") conversationType: Conversation.ConversationType,
-        @Param("targetId") targetId: Long,
-        @Param("msgId") msgId: String,
-        @Param("content") content: String,
-        @Param("msgType") msgType: Int,
-        @Param("senderId") senderId: Long,
-        @Param("msgTime") msgTime: LocalDateTime
-    ): Int
+    fun deleteByUserIdAndTargetId(userId: Long, targetId: Long): Int
 
-    @Modifying
-    @Transactional
-    @Query("UPDATE Conversation c SET c.unreadCount = 0 WHERE c.id = :conversationId")
-    fun clearUnreadCount(@Param("conversationId") conversationId: Long): Int
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE Conversation c SET c.isMuted = :isMuted WHERE c.id = :conversationId")
-    fun updateMuteStatus(
-        @Param("conversationId") conversationId: Long,
-        @Param("isMuted") isMuted: Boolean
-    ): Int
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE Conversation c SET c.isPinned = :isPinned WHERE c.id = :conversationId")
-    fun updatePinStatus(
-        @Param("conversationId") conversationId: Long,
-        @Param("isPinned") isPinned: Boolean
-    ): Int
-
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM Conversation c WHERE c.user.id = :userId AND c.conversationType = :conversationType AND c.targetId = :targetId")
-    fun deleteByUserAndTarget(
-        @Param("userId") userId: Long,
-        @Param("conversationType") conversationType: Conversation.ConversationType,
-        @Param("targetId") targetId: Long
-    ): Int
-
-    fun countByUserIdAndUnreadCountGreaterThan(userId: Long, unreadCount: Int): Long
 }

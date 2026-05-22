@@ -44,9 +44,9 @@ class STOMPService @Autowired constructor(
             DarcyLogger.info("保存消息: msgId=${savedMessage.msgId} receiverId=${privateMessage.receiverId}")
             messageReadStatusService.createOrUpdateReadStatus(
                 msgId = savedMessage.msgId,
-                userId = privateMessage.receiverId,
+                userId = privateMessage.senderId,
+                targetId = privateMessage.receiverId,
                 conversationType = Conversation.ConversationType.PRIVATE,
-                targetId = privateMessage.senderId,
                 isRead = false
             )
             DarcyLogger.info("创建消息已读状态: msgId=${savedMessage.msgId}, receiverId=${privateMessage.receiverId}")
@@ -55,7 +55,7 @@ class STOMPService @Autowired constructor(
             websocket.convertAndSendToUser(
                 recipient,
                 "/queue/message",
-                privateMessage.copy(msgId = savedMessage.msgId),
+                privateMessage,
                 headers
             )
 

@@ -11,20 +11,23 @@ import java.time.LocalDateTime
 @Repository
 interface MessageReadStatusRepository : JpaRepository<MessageReadStatus, Long> {
 
-    @Query("SELECT mrs FROM MessageReadStatus mrs WHERE mrs.msgId = :msgId AND mrs.user.id = :userId")
+    @Query("SELECT mrs FROM MessageReadStatus mrs WHERE mrs.targetId = :userId AND mrs.msgId = :msgId")
     fun findByUserIdAndMsgId(userId: Long, msgId: String): MessageReadStatus?
 
-    @Query("SELECT mrs FROM MessageReadStatus mrs WHERE mrs.user.id = :userId AND mrs.msgId IN :msgIds")
+    @Query("SELECT mrs FROM MessageReadStatus mrs WHERE mrs.targetId = :userId AND mrs.msgId IN :msgIds")
     fun findByUserIdAndMsgIds(userId: Long, msgIds: List<String>): List<MessageReadStatus>
-
-    @Query("SELECT COUNT(mrs) FROM MessageReadStatus mrs WHERE mrs.user.id = :userId AND mrs.isRead = false")
-    fun countUnreadMessages(userId: Long): Long
 
     @Query("SELECT mrs FROM MessageReadStatus mrs WHERE mrs.user.id = :userId AND mrs.conversationType = 'PRIVATE' AND mrs.targetId = :targetId AND mrs.isRead = false ORDER BY mrs.readTime ASC")
     fun findUnreadMessagesByConversation(userId: Long, targetId: Long): List<MessageReadStatus>
 
     @Modifying
     @Transactional
-    @Query("UPDATE MessageReadStatus mrs SET mrs.isRead = true, mrs.readTime = :readTime WHERE mrs.msgId IN :msgIds AND mrs.targetId = :userId")
+    @Query("UPDATE MessageReadStatus mrs SET mrs.isRead = true, mrs.readTime = :readTime " +
+            "WHERE mrs.targetId = :userId AND mrs.msgId IN :msgIds")
     fun markMessagesAsRead(userId: Long, msgIds: List<String>, readTime: LocalDateTime): Int
+
+    @Modifying
+    @Query("DELETE FROM MessageReadStatus mrs WHERE (mrs.user.id = :userId AND mrs.targetId = :friendId) " +
+            "OR (mrs.user.id = :friendId AND mrs.targetId = :userId)")
+    fun deleteByUserIdAndTargetId(userId: Long, friendId: Long): Int
 }

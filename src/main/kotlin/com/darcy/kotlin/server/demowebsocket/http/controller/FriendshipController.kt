@@ -10,13 +10,21 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class FriendshipController @Autowired constructor(
-    val friendshipService: FriendshipService
+    private val friendshipService: FriendshipService
 ) : IFriendshipApi {
     override fun queryFriendships(params: Map<String, String>): String {
-        val userId = params["userId"]?.toLongOrNull() ?: throw ParamsException.ParamsNotValid(
-            mapOf("userId" to "用户ID不能为空")
-        )
+        val userId = params["userId"]?.toLongOrNull()
+            ?: throw ParamsException.ParamsNotValid(mapOf("userId" to "用户ID不能为空"))
         val result = friendshipService.queryFriendships(userId)
         return ResultEntity.success(result.toDTO()).toJsonString()
+    }
+
+    override fun deleteFriendship(params: Map<String, String>): String {
+        val userId = params["userId"]?.toLongOrNull()
+            ?: throw ParamsException.ParamsNotValid(mapOf("userId" to "用户ID不能为空"))
+        val friendId = params["friendId"]?.toLongOrNull()
+            ?: throw ParamsException.ParamsNotValid(mapOf("friendId" to "好友ID不能为空"))
+        val result = friendshipService.deleteFriendship(userId, friendId)
+        return ResultEntity.success(result).toJsonString()
     }
 }

@@ -91,4 +91,8 @@ class FriendRequestService @Autowired constructor(
     fun queryByToUserId(toUserId: Long): List<FriendRequest> {
         return friendRequestRepository.findByToUserId(toUserId)
     }
+
+    fun deleteByUserIdAndFriendId(userId: Long, friendId: Long): Int {
+        return friendRequestRepository.deleteByFromUserIdAndToUserId(userId, friendId)
+    }
 }

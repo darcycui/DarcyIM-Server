@@ -23,13 +23,15 @@ import java.time.LocalDateTime
 @DynamicInsert
 @DynamicUpdate
 open class User(
-    @Column(
-        name = "username", nullable = false, length = 64, unique = true,
+    @Column(name = "userid", nullable = false, length = 64)
+    open var userid: String = "",
 
-        )
+    @Column(name = "username", nullable = false, length = 64, unique = true,)
     open var username: String = "",
+
     @Column(name = "password_hash", nullable = false, length = 255)
     open var passwordHash: String = "",
+
     @Column(name = "nickname", nullable = false, length = 64)
     open var nickname: String = "",
 

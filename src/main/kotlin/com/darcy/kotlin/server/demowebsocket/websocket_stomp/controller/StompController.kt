@@ -27,8 +27,10 @@ class StompController @Autowired constructor(
         DarcyLogger.info("private sender: $sender message=$privateMessage")
         val dhPublicKey = sha.getFirstNativeHeader("dhPublicKey") ?: throw X3DHException.DH_KEY_HEADER_NOT_EXIST
         val fromUserId = sha.getFirstNativeHeader("fromUserId") ?: throw X3DHException.FROM_USER_ID_HEADER_NOT_EXIST
-        val sendingIndex = sha.getFirstNativeHeader("sendingIndex")?.toLongOrNull() ?: throw X3DHException.SENDING_INDEX_HEADER_NOT_EXIST
-        val receivingIndex = sha.getFirstNativeHeader("receivingIndex")?.toLongOrNull() ?: throw X3DHException.RECEIVING_INDEX_HEADER_NOT_EXIST
+        val sendingIndex = sha.getFirstNativeHeader("sendingIndex")?.toLongOrNull()
+            ?: throw X3DHException.SENDING_INDEX_HEADER_NOT_EXIST
+        val receivingIndex = sha.getFirstNativeHeader("receivingIndex")?.toLongOrNull()
+            ?: throw X3DHException.RECEIVING_INDEX_HEADER_NOT_EXIST
         stompService.sendPrivate(privateMessage, fromUserId, dhPublicKey, sendingIndex, receivingIndex)
     }
 
@@ -47,10 +49,10 @@ class StompController @Autowired constructor(
     }
 
     override fun markMessageRead(sha: SimpMessageHeaderAccessor, messageReadStatusInputDTO: MessageReadStatusInputDTO) {
-        val updatedCount = messageReadStatusService.markMessagesAsRead(messageReadStatusInputDTO.userId, messageReadStatusInputDTO.msgIds)
-        val result = messageReadStatusInputDTO.msgIds.mapNotNull {
-            messageReadStatusService.getMessageReadStatus(it, messageReadStatusInputDTO.userId)
-        }
+        val userId = messageReadStatusInputDTO.userId
+        val msgIds = messageReadStatusInputDTO.msgIds
+        val updatedCount = messageReadStatusService.markMessagesAsRead(userId, msgIds)
+        val result = messageReadStatusService.getMessagesReadStatus(userId, msgIds)
         websocket.convertAndSendToUser(
             messageReadStatusInputDTO.targetName,
             "/queue/message/read",

@@ -19,12 +19,13 @@ class MessageReadController @Autowired constructor(
     override fun markMessageRead(params: Map<String, String>): String {
         val messageReadStatusInputDTOStr = params["messageReadStatusInputDTO"]
             ?: throw ParamsException.ParamsNotValid(mapOf("messageReadStatusInputDTO" to "消息参数不能为空"))
-        val messageReadStatusInputDTO = JSON.parseObject(messageReadStatusInputDTOStr, MessageReadStatusInputDTO::class.java)
-            ?: throw ParamsException.ParamsNotValid(mapOf("messageReadStatusInputDTO" to "消息参数格式错误"))
-        val updatedCount = messageReadStatusService.markMessagesAsRead(messageReadStatusInputDTO.userId, messageReadStatusInputDTO.msgIds)
-        val result = messageReadStatusInputDTO.msgIds.mapNotNull {
-            messageReadStatusService.getMessageReadStatus(it, messageReadStatusInputDTO.userId)
-        }
+        val messageReadStatusInputDTO =
+            JSON.parseObject(messageReadStatusInputDTOStr, MessageReadStatusInputDTO::class.java)
+                ?: throw ParamsException.ParamsNotValid(mapOf("messageReadStatusInputDTO" to "消息参数格式错误"))
+        val userId = messageReadStatusInputDTO.userId
+        val msgIds = messageReadStatusInputDTO.msgIds
+        val updatedCount = messageReadStatusService.markMessagesAsRead(userId, msgIds)
+        val result = messageReadStatusService.getMessagesReadStatus(userId, msgIds)
         websocket.convertAndSendToUser(
             messageReadStatusInputDTO.targetName,
             "/queue/message/read",

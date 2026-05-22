@@ -4,7 +4,7 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.conversation.Conversat
 import com.darcy.kotlin.server.demowebsocket.exception.code700.ConversationException
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.repository.ConversationRepository
-import com.darcy.kotlin.server.demowebsocket.utils.IdGenerator
+import com.darcy.kotlin.server.demowebsocket.utils.UUIdGenerator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -13,7 +13,7 @@ class ConversationService @Autowired constructor(
     private val conversationRepository: ConversationRepository,
     private val userService: UserService,
     private val friendshipService: FriendshipService,
-    private val idGenerator: IdGenerator,
+    private val idGenerator: UUIdGenerator,
     private val groupService: GroupService,
 ) {
     fun createConversation(
@@ -70,5 +70,9 @@ class ConversationService @Autowired constructor(
             throw ConversationException.CONVERSATION_NOT_EXIST
         }
         return conversation.get()
+    }
+
+    fun deleteByUserIdAndTargetId(userId: Long, friendId: Long): Int {
+        return conversationRepository.deleteByUserIdAndTargetId(userId, friendId)
     }
 }

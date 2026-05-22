@@ -26,11 +26,20 @@ class MessageReadStatusTests {
     // 模拟MVC
     @Autowired
     private lateinit var mockMvc: MockMvc
+//    private val messageReadStatusInputDTO = MessageReadStatusInputDTO(
+//        userId = 2,
+//        targetId = 1,
+//        targetName = "tony",
+//        msgIds = listOf("msg_448022166593245184"),
+//        conversationType = 1,
+//        clientType = "",
+//        deviceId = ""
+//    )
     private val messageReadStatusInputDTO = MessageReadStatusInputDTO(
-        userId = 2,
-        targetId = 1,
-        targetName = "tony",
-        msgIds = listOf("msg_448043956887523328"),
+        userId = 1,
+        targetId = 2,
+        targetName = "tina",
+        msgIds = listOf("msg_448051142443307008"),
         conversationType = 1,
         clientType = "",
         deviceId = ""

@@ -37,4 +37,18 @@ class FriendshipTests {
             .contentAsString
         println("result-->$result")
     }
+    @Test
+    fun `test-delete-friendship`(){
+        val result = mockMvc.perform(
+            post("http://localhost:$port/api/friendships/delete")
+                .header(HEADER_AUTHORIZATION, JWT_TOKEN)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("userId", "3")
+                .param("friendId", "4")
+        ).andExpect(status().isOk)
+            .andReturn()
+            .response
+            .contentAsString
+        println("result-->$result")
+    }
 }

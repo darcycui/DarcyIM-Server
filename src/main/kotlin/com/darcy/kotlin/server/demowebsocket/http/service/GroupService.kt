@@ -6,7 +6,7 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.group.GroupMember
 import com.darcy.kotlin.server.demowebsocket.exception.code900.GroupException
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.repository.GroupRepository
-import com.darcy.kotlin.server.demowebsocket.utils.IdGenerator
+import com.darcy.kotlin.server.demowebsocket.utils.UUIdGenerator
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
@@ -21,7 +21,7 @@ class GroupService @Autowired constructor(
     // 循环依赖 使用 @Lazy 解决
     @Lazy private val conversationService: ConversationService,
     private val userService: UserService,
-    private val idGenerator: IdGenerator,
+    private val idGenerator: UUIdGenerator,
 ) {
     @Transactional
     fun createGroup(params: Map<String, String>): Group {

@@ -19,7 +19,10 @@ class GroupMessageController @Autowired constructor(
         val content = params["content"] ?: throw ParamsException.ParamsNotValid(
             mapOf("content" to "消息内容不能为空")
         )
-        val result = groupMessageService.createMessage(senderId, groupId, conversationId, content)
+        val msgId = params["msgId"] ?: throw ParamsException.ParamsNotValid(
+            mapOf("msgId" to "消息ID不能为空")
+        )
+        val result = groupMessageService.createMessage(senderId, groupId, conversationId, content, msgId)
         return ResultEntity.success(result.toDTO()).toJsonString()
     }
 

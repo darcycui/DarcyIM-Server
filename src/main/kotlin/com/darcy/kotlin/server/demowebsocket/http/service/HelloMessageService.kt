@@ -16,4 +16,8 @@ class HelloMessageService @Autowired constructor(
     fun queryHelloMessage(fromUserId: Long, toUserId: Long): HelloMessage? {
         return helloMessageRepository.findByUserId(fromUserId, toUserId)
     }
+
+    fun deleteByUserIdAndFriendId(userId: Long, friendId: Long): Int {
+        return helloMessageRepository.deleteByUserIdAndFriendId(userId, friendId)
+    }
 }

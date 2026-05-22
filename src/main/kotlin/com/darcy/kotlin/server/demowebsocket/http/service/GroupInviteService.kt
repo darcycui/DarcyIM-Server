@@ -5,7 +5,7 @@ import com.darcy.kotlin.server.demowebsocket.exception.code900.GroupException
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.repository.GroupInviteRepository
 import com.darcy.kotlin.server.demowebsocket.http.repository.GroupRepository
-import com.darcy.kotlin.server.demowebsocket.utils.IdGenerator
+import com.darcy.kotlin.server.demowebsocket.utils.UUIdGenerator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -15,7 +15,7 @@ class GroupInviteService @Autowired constructor(
     private val groupRepository: GroupRepository,
     private val userService: UserService,
     private val friendshipService: FriendshipService,
-    private val idGenerator: IdGenerator
+    private val idGenerator: UUIdGenerator
 ) {
     fun createGroupInvite(inviterId: Long, inviteeId: Long, id: Long): GroupInvite {
         val invitor = userService.queryUserById(inviterId)

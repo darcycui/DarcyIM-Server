@@ -5,8 +5,9 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.message.PrivateMessage
 import com.darcy.kotlin.server.demowebsocket.exception.code700.ConversationException
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.repository.PrivateMessageRepository
-import com.darcy.kotlin.server.demowebsocket.utils.IdGenerator
+import com.darcy.kotlin.server.demowebsocket.utils.UUIdGenerator
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -16,16 +17,19 @@ import java.time.LocalDateTime
 @Service
 class PrivateMessageService @Autowired constructor(
     private val privateMessageRepository: PrivateMessageRepository,
+    @Lazy
     private val conversationService: ConversationService,
+    @Lazy
     private val friendshipService: FriendshipService,
     private val userService: UserService,
-    private val idGenerator: IdGenerator
+    private val idGenerator: UUIdGenerator
 ) {
     fun createMessage(
         senderId: Long,
         receiverId: Long,
         conversationId: Long,
         content: String,
+        msgId:String,
     ): PrivateMessage {
         val sender = userService.queryUserById(senderId)
         val receiver = userService.queryUserById(receiverId)
@@ -33,7 +37,7 @@ class PrivateMessageService @Autowired constructor(
         validateConversation(conversationId, senderId, receiverId)
         val message = PrivateMessage(
             // 单聊消息ID 唯一
-            msgId = idGenerator.nextMessageId(),
+            msgId = msgId,
             sender = sender,
             receiver = receiver,
             content = content,
@@ -87,5 +91,9 @@ class PrivateMessageService @Autowired constructor(
         // result.totalPages  // 总页数
         // result.totalElements  // 总记录数
         // result.number  // 当前页码（从 0 开始）
+    }
+
+    fun deleteByUserIdAndFriendId(userId: Long, friendId: Long): Int {
+        return privateMessageRepository.deleteByUserIdAndFriendId(userId, friendId)
     }
 }

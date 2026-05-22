@@ -8,4 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam
 interface IFriendshipApi {
     @PostMapping("/query/all")
     fun queryFriendships(@RequestParam params: Map<String, String>): String
+
+    @PostMapping("/delete")
+    fun deleteFriendship(@RequestParam params: Map<String, String>): String
+
 }

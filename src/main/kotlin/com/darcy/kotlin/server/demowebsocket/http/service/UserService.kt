@@ -4,9 +4,11 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.User
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.repository.UserRepository
 import com.darcy.kotlin.server.demowebsocket.utils.PasswordUtil
+import com.darcy.kotlin.server.demowebsocket.utils.UUIdGenerator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Service
 class UserService @Autowired constructor(
@@ -29,6 +31,7 @@ class UserService @Autowired constructor(
             throw UserException.USER_EMAIL_ALREADY_EXIST
         }
         val realUser = userEntity.apply {
+            userid = UUIdGenerator().nextUserId()
             passwordHash = passwordUtil.encode(passwordHash)
         }
         return userRepository.save(realUser)

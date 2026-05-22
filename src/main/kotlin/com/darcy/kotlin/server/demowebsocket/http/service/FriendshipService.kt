@@ -4,12 +4,20 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.friend.Friendship
 import com.darcy.kotlin.server.demowebsocket.http.repository.FriendshipRepository
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 @Service
 class FriendshipService @Autowired constructor(
-    val friendshipRepository: FriendshipRepository,
-    val userService: UserService
+    private val friendshipRepository: FriendshipRepository,
+    private val userService: UserService,
+    @Lazy
+    private val friendRequestService: FriendRequestService,
+    private val helloMessageService: HelloMessageService,
+    private val readStatusService: MessageReadStatusService,
+    private val privateMessageService: PrivateMessageService,
+    @Lazy
+    private val conversationService: ConversationService,
 ) {
     @Transactional
     fun createFriendship(userId: Long, friendId: Long): List<Friendship> {
@@ -43,5 +51,24 @@ class FriendshipService @Autowired constructor(
     fun isFriend(userId: Long, friendId: Long): Boolean {
         val result = friendshipRepository.findByUserIdAndFriendId(userId, friendId)
         return result != null
+    }
+
+    @Transactional
+    fun deleteFriendship(userId: Long, friendId: Long): String {
+        val friendshipDeleteCount = friendshipRepository.deleteByUserIdAndFriendId(userId, friendId)
+        val friendRequestDeleteCount = friendRequestService.deleteByUserIdAndFriendId(userId, friendId)
+        val helloMessageDeleteCount = helloMessageService.deleteByUserIdAndFriendId(userId, friendId)
+        val readStatusDeleteCount = readStatusService.deleteByUserIdAndTargetId(userId, friendId)
+        val privateMessageDeleteCount = privateMessageService.deleteByUserIdAndFriendId(userId, friendId)
+        val conversationDeleteCount = conversationService.deleteByUserIdAndTargetId(userId, friendId)
+        return if (friendshipDeleteCount > 0 && friendRequestDeleteCount > 0
+            && helloMessageDeleteCount > 0 && readStatusDeleteCount > 0
+            && privateMessageDeleteCount >= 0
+            && conversationDeleteCount >= 0
+        ) {
+            "删除成功"
+        } else {
+            "删除失败"
+        }
     }
 }

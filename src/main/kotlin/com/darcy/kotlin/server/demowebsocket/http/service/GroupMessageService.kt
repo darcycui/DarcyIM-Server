@@ -5,7 +5,7 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.message.GroupMessage
 import com.darcy.kotlin.server.demowebsocket.exception.code700.ConversationException
 import com.darcy.kotlin.server.demowebsocket.exception.code900.GroupException
 import com.darcy.kotlin.server.demowebsocket.http.repository.GroupMessageRepository
-import com.darcy.kotlin.server.demowebsocket.utils.IdGenerator
+import com.darcy.kotlin.server.demowebsocket.utils.UUIdGenerator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -19,13 +19,14 @@ class GroupMessageService @Autowired constructor(
     private val groupService: GroupService,
     private val groupMemberService: GroupMemberService,
     private val conversationService: ConversationService,
-    private val idGenerator: IdGenerator,
+    private val idGenerator: UUIdGenerator,
 ) {
     fun createMessage(
         senderId: Long,
         groupId: Long,
         conversationId: Long,
-        content: String
+        content: String,
+        msgId: String,
     ): GroupMessage {
         val sender = userService.queryUserById(senderId)
         val group = groupService.queryGroupById(groupId)
@@ -33,7 +34,7 @@ class GroupMessageService @Autowired constructor(
         validateGroupMember(senderId, groupId)
         val message = GroupMessage(
             // 群消息ID 唯一
-            msgId = idGenerator.nextGroupMessageId(),
+            msgId = msgId,
             sender = sender,
             group = group,
             content = content,
