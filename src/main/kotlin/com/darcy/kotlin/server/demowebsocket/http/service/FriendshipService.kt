@@ -2,6 +2,7 @@ package com.darcy.kotlin.server.demowebsocket.http.service
 
 import com.darcy.kotlin.server.demowebsocket.domain.table.friend.Friendship
 import com.darcy.kotlin.server.demowebsocket.http.repository.FriendshipRepository
+import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
@@ -56,11 +57,17 @@ class FriendshipService @Autowired constructor(
     @Transactional
     fun deleteFriendship(userId: Long, friendId: Long): String {
         val friendshipDeleteCount = friendshipRepository.deleteByUserIdAndFriendId(userId, friendId)
+        DarcyLogger.info("friendshipDeleteCount-->$friendshipDeleteCount")
         val friendRequestDeleteCount = friendRequestService.deleteByUserIdAndFriendId(userId, friendId)
+        println("friendRequestDeleteCount-->$friendRequestDeleteCount")
         val helloMessageDeleteCount = helloMessageService.deleteByUserIdAndFriendId(userId, friendId)
+        println("helloMessageDeleteCount-->$helloMessageDeleteCount")
         val readStatusDeleteCount = readStatusService.deleteByUserIdAndTargetId(userId, friendId)
+        println("readStatusDeleteCount-->$readStatusDeleteCount")
         val privateMessageDeleteCount = privateMessageService.deleteByUserIdAndFriendId(userId, friendId)
+        println("privateMessageDeleteCount-->$privateMessageDeleteCount")
         val conversationDeleteCount = conversationService.deleteByUserIdAndTargetId(userId, friendId)
+        println("conversationDeleteCount-->$conversationDeleteCount")
         return if (friendshipDeleteCount > 0 && friendRequestDeleteCount > 0
             && helloMessageDeleteCount > 0 && readStatusDeleteCount > 0
             && privateMessageDeleteCount >= 0

@@ -2,7 +2,6 @@ package com.darcy.kotlin.server.demowebsocket.websocket_stomp.controller
 
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.MessageReadStatusInputDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
-import com.darcy.kotlin.server.demowebsocket.domain.dto.message.MessageReadStatusDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.exception.code1000.X3DHException
 import com.darcy.kotlin.server.demowebsocket.http.service.MessageReadStatusService
@@ -25,7 +24,7 @@ class StompController @Autowired constructor(
         DarcyLogger.info("private message=$privateMessage")
         val sender = sha.user?.name ?: ""
         DarcyLogger.info("private sender: $sender message=$privateMessage")
-        val dhPublicKey = sha.getFirstNativeHeader("dhPublicKey") ?: throw X3DHException.DH_KEY_HEADER_NOT_EXIST
+        val dhPublicKey = sha.getFirstNativeHeader("dhPublicKey") ?: ""
         val fromUserId = sha.getFirstNativeHeader("fromUserId") ?: throw X3DHException.FROM_USER_ID_HEADER_NOT_EXIST
         val sendingIndex = sha.getFirstNativeHeader("sendingIndex")?.toLongOrNull()
             ?: throw X3DHException.SENDING_INDEX_HEADER_NOT_EXIST
@@ -51,8 +50,8 @@ class StompController @Autowired constructor(
     override fun markMessageRead(sha: SimpMessageHeaderAccessor, messageReadStatusInputDTO: MessageReadStatusInputDTO) {
         val userId = messageReadStatusInputDTO.userId
         val msgIds = messageReadStatusInputDTO.msgIds
-        val updatedCount = messageReadStatusService.markMessagesAsRead(userId, msgIds)
-        val result = messageReadStatusService.getMessagesReadStatus(userId, msgIds)
+        val updatedCount = messageReadStatusService.receiverMarkMessagesAsRead(userId, msgIds)
+        val result = messageReadStatusService.receiverGetMessageListReadStatus(userId, msgIds)
         websocket.convertAndSendToUser(
             messageReadStatusInputDTO.targetName,
             "/queue/message/read",

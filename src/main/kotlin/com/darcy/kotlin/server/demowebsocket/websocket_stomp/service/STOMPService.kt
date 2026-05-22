@@ -42,7 +42,7 @@ class STOMPService @Autowired constructor(
             val receiveUser = userService.queryUserById(privateMessage.receiverId)
             val savedMessage = privateMessageService.createMessage(privateMessage.toEntity(sendUser, receiveUser))
             DarcyLogger.info("保存消息: msgId=${savedMessage.msgId} receiverId=${privateMessage.receiverId}")
-            messageReadStatusService.createOrUpdateReadStatus(
+            messageReadStatusService.senderCreateOrUpdateReadStatus(
                 msgId = savedMessage.msgId,
                 userId = privateMessage.senderId,
                 targetId = privateMessage.receiverId,
@@ -95,7 +95,7 @@ class STOMPService @Autowired constructor(
             val members = groupService.queryAllGroupMembersById(groupMessage.groupId)
             members.forEach { member ->
                 if (member.id != groupMessage.senderId) {
-                    messageReadStatusService.createOrUpdateReadStatus(
+                    messageReadStatusService.senderCreateOrUpdateReadStatus(
                         msgId = savedMessage.msgId,
                         userId = member.id,
                         conversationType = Conversation.ConversationType.GROUP,
@@ -128,7 +128,7 @@ class STOMPService @Autowired constructor(
             val members = groupService.queryAllGroupMembersById(groupId)
             members.forEach { member ->
                 if (member.id != groupMessage.senderId) {
-                    messageReadStatusService.createOrUpdateReadStatus(
+                    messageReadStatusService.senderCreateOrUpdateReadStatus(
                         msgId = savedMessage.msgId,
                         userId = member.id,
                         conversationType = Conversation.ConversationType.GROUP,

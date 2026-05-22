@@ -48,7 +48,7 @@ class MessageReadStatusTests {
     @Test
     fun `test-mark-message-read-by-http`(){
         val result = mockMvc.perform(
-            post("http://localhost:$port/api/message/read/mark_read")
+            post("http://localhost:$port/api/message/read/push/mark_read")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("messageReadStatusInputDTO", JSON.toJSONString(messageReadStatusInputDTO))
         ).andExpect(status().isOk)

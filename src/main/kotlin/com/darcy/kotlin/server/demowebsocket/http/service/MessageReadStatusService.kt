@@ -18,7 +18,7 @@ class MessageReadStatusService @Autowired constructor(
 ) {
 
     @Transactional
-    fun createOrUpdateReadStatus(
+    fun senderCreateOrUpdateReadStatus(
         msgId: String,
         userId: Long,
         conversationType: Conversation.ConversationType,
@@ -28,55 +28,44 @@ class MessageReadStatusService @Autowired constructor(
         deviceId: String = ""
     ): MessageReadStatus {
         val user = userService.queryUserById(userId)
-        val existingStatus = messageReadStatusRepository.findByUserIdAndMsgId(userId, msgId)
-        return if (existingStatus != null) {
-            existingStatus.apply {
-                this.conversationType = conversationType
-                this.targetId = targetId
-                this.isRead = isRead
-                if (isRead && readTime == null) {
-                    this.readTime = LocalDateTime.now()
-                }
-                this.clientType = clientType
-                this.deviceId = deviceId
-            }.let { messageReadStatusRepository.save(it) }
-        } else {
-            val newStatus = MessageReadStatus(
-                msgId = msgId,
-                user = user,
-                conversationType = conversationType,
-                targetId = targetId,
-                isRead = isRead,
-                readTime = if (isRead) LocalDateTime.now() else null,
-                clientType = clientType,
-                deviceId = deviceId
-            )
-            messageReadStatusRepository.save(newStatus)
+        messageReadStatusRepository.senderFindBySenderIdAndMsgId(userId, msgId)?.apply {
+            messageReadStatusRepository.delete(this)
         }
+        val newStatus = MessageReadStatus(
+            msgId = msgId,
+            user = user,
+            conversationType = conversationType,
+            targetId = targetId,
+            isRead = isRead,
+            readTime = if (isRead) LocalDateTime.now() else null,
+            clientType = clientType,
+            deviceId = deviceId
+        )
+        return messageReadStatusRepository.save(newStatus)
     }
 
     @Transactional
-    fun markMessagesAsRead(userId: Long, msgIds: List<String>): Int {
+    fun receiverMarkMessagesAsRead(userId: Long, msgIds: List<String>): Int {
         if (msgIds.isEmpty()) return 0
         val readTime = LocalDateTime.now()
-        val updatedCount = messageReadStatusRepository.markMessagesAsRead(userId, msgIds, readTime)
+        val updatedCount = messageReadStatusRepository.receiverMarkMessagesAsRead(userId, msgIds, readTime)
         DarcyLogger.info("批量标记消息已读: userId=$userId, count=$updatedCount")
         return updatedCount
     }
 
-    fun getUnreadMessagesByConversation(userId: Long, targetId: Long): MessageReadStatusDTO {
-        return messageReadStatusRepository.findUnreadMessagesByConversation(userId, targetId).toDTO()
+    fun receiverGetMessageListReadStatus(userId: Long, msgIds: List<String>): MessageReadStatusDTO {
+        return messageReadStatusRepository.receiverFindByUserIdAndMsgIdList(userId, msgIds).toDTO()
     }
 
-    fun getMessageReadStatus(userId: Long, msgId: String): MessageReadStatusDTO {
-        return messageReadStatusRepository.findByUserIdAndMsgId(userId, msgId).toDTO()
-    }
-
-    fun getMessagesReadStatus(userId: Long, msgIds: List<String>): MessageReadStatusDTO {
-        return messageReadStatusRepository.findByUserIdAndMsgIds(userId, msgIds).toDTO()
+    fun receiverGetUnreadMessageListByConversation(userId: Long, targetId: Long): MessageReadStatusDTO {
+        return messageReadStatusRepository.receiverFindUnreadMessageListByConversation(userId, targetId).toDTO()
     }
 
     fun deleteByUserIdAndTargetId(userId: Long, friendId: Long): Int {
         return messageReadStatusRepository.deleteByUserIdAndTargetId(userId, friendId)
+    }
+
+    fun senderSyncMessageReadStatus(userId: Long, targetId: Long): MessageReadStatusDTO {
+        return messageReadStatusRepository.senderFindReadMessageListByConversation(userId, targetId).toDTO()
     }
 }
