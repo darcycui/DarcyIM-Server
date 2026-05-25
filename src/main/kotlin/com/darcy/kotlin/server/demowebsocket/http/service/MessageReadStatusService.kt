@@ -4,11 +4,13 @@ import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverOfflineMes
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.*
 import com.darcy.kotlin.server.demowebsocket.domain.table.conversation.Conversation
 import com.darcy.kotlin.server.demowebsocket.domain.table.message.MessageReadStatus
+import com.darcy.kotlin.server.demowebsocket.domain.table.message.PrivateMessage
 import com.darcy.kotlin.server.demowebsocket.http.repository.MessageReadStatusRepository
 import com.darcy.kotlin.server.demowebsocket.http.repository.PrivateMessageRepository
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -88,96 +90,33 @@ class MessageReadStatusService @Autowired constructor(
 
     /**
      * 接收方离线消息同步（核心方法）
-     * 支持游标分页、增量同步、幂等性
+     * 参考 queryBothMessagesPageByConversation 重构为 Page<PrivateMessage>
+     * 支持标准分页、增量同步
      */
     @Transactional(readOnly = true)
-    fun receiverSyncOfflineMessages(input: ReceiverOfflineMessageSyncInputDTO): ReceiverOfflineMessageSyncDTO {
+    fun receiverSyncOfflineMessages(input: ReceiverOfflineMessageSyncInputDTO): Page<PrivateMessage> {
         val userId = input.userId
         val targetId = input.targetId
-        val limit = if (input.limit in 1..100) input.limit else 50
+        val page = input.page ?: 0
+        val size = if (input.size in 1..100) input.size?: 50 else 50
+        val pageable = PageRequest.of(page, size)
 
-        DarcyLogger.info("接收方离线同步: userId=$userId, targetId=$targetId, lastMsgId=${input.lastMsgId}")
+        DarcyLogger.info("接收方离线同步: userId=$userId, targetId=$targetId, page=$page, size=$size")
 
-        // 1. 确定同步起始点（游标策略）
-        val messages = if (!input.lastMsgId.isNullOrEmpty()) {
-            // 策略1：基于消息ID游标
-            privateMessageRepository.findUnreadMessagesWithCursor(
-                userId, targetId, input.lastMsgId, PageRequest.of(0, limit)
-            )
-        } else if (!input.lastSyncTime.isNullOrEmpty()) {
-            // 策略2：基于时间戳
+        // 根据参数选择不同的查询策略
+        val messagesPage = if (!input.lastSyncTime.isNullOrEmpty()) {
+            // 策略1：基于时间戳的分页查询
             val sinceTime = TimeUtil.parseStringToDateTime(input.lastSyncTime)
-            privateMessageRepository.findMessagesSinceTime(
-                userId, targetId, sinceTime, PageRequest.of(0, limit)
+            privateMessageRepository.findMessagesSinceTimePage(
+                userId, targetId, sinceTime, pageable
             )
         } else {
-            // 策略3：全量拉取未读消息
-            messageReadStatusRepository.receiverFindUnreadMessageListByConversation(userId, targetId)
-                .mapNotNull { status ->
-                    privateMessageRepository.findById(status.msgId.toLongOrNull() ?: 0).orElse(null)
-                }
-                .take(limit)
+            // 策略2：标准未读消息分页查询
+            privateMessageRepository.findUnreadMessagesPage(userId, targetId, pageable)
         }
 
-        // 2. 构建响应
-        val messageDTOs = messages.map { it.toDTO() }
-        val hasMore = messages.size == limit
-        val nextCursor = if (hasMore && messages.isNotEmpty()) {
-            messages.last().msgId
-        } else null
+        DarcyLogger.info("离线同步完成: totalElements=${messagesPage.totalElements}, totalPages=${messagesPage.totalPages}, currentPage=${messagesPage.content.size}")
 
-        // 3. 获取已读状态映射
-        val msgIds = messages.map { it.msgId }
-        val readStatusMap = if (msgIds.isNotEmpty()) {
-            messageReadStatusRepository.receiverFindByUserIdAndMsgIdList(userId, msgIds)
-                .associate { it.msgId to it.isRead }
-        } else emptyMap()
-
-        // 4. 统计未读数
-        val unreadCount = messageReadStatusRepository.receiverFindUnreadMessageListByConversation(userId, targetId).size
-
-        DarcyLogger.info("离线同步完成: count=${messageDTOs.size}, hasMore=$hasMore, unreadCount=$unreadCount")
-
-        return ReceiverOfflineMessageSyncDTO(
-            messages = messageDTOs,
-            hasMore = hasMore,
-            nextCursor = nextCursor,
-            syncTime = TimeUtil.getCurrentTimeString(),
-            unreadCount = unreadCount,
-            readStatusMap = readStatusMap,
-            conflictMessages = emptyList()
-        )
-    }
-
-    /**
-     * 智能同步：拉取消息并自动标记为已读（原子操作）
-     * 适用于客户端希望"拉取即已读"的场景
-     */
-    @Transactional
-    fun receiverSyncAndMarkAsRead(
-        userId: Long,
-        targetId: Long,
-        lastMsgId: String?,
-        limit: Int = 50
-    ): ReceiverOfflineMessageSyncDTO {
-        // 1. 先拉取消息
-        val syncResult = receiverSyncOfflineMessages(
-            ReceiverOfflineMessageSyncInputDTO(
-                userId = userId,
-                targetId = targetId,
-                lastMsgId = lastMsgId,
-                limit = limit
-            )
-        )
-
-        // 2. 批量标记为已读
-        if (syncResult.messages.isNotEmpty()) {
-            val msgIds = syncResult.messages.map { it.msgId }
-            receiverMarkMessagesAsRead(userId, msgIds)
-
-            DarcyLogger.info("同步并标记已读: userId=$userId, count=${msgIds.size}")
-        }
-
-        return syncResult
+        return messagesPage
     }
 }

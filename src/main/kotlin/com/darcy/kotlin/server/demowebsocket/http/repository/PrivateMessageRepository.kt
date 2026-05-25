@@ -34,23 +34,21 @@ interface PrivateMessageRepository : JpaRepository<PrivateMessage, Long> {
     )
     fun deleteByUserIdAndFriendId(userId: Long, friendId: Long): Int
 
-    // 新增：查询发送给指定用户的未读消息（游标分页）
+    // 重构：返回 Page 类型的未读消息（标准分页）
     @Query(
         "SELECT pm FROM PrivateMessage pm WHERE " +
                 "pm.receiver.id = :receiverId " +
                 "AND pm.sender.id = :senderId " +
                 "AND pm.isRead = false " +
-                "AND (:lastMsgId IS NULL OR pm.sendTime > (SELECT pm2.sendTime FROM PrivateMessage pm2 WHERE pm2.msgId = :lastMsgId)) " +
                 "ORDER BY pm.sendTime ASC"
     )
-    fun findUnreadMessagesWithCursor(
+    fun findUnreadMessagesPage(
         receiverId: Long,
         senderId: Long,
-        lastMsgId: String?,
         pageable: Pageable
-    ): List<PrivateMessage>
+    ): Page<PrivateMessage>
 
-    // 新增：查询发送给指定用户的消息（按时间范围）
+    // 重构：返回 Page 类型的消息（按时间范围）
     @Query(
         "SELECT pm FROM PrivateMessage pm WHERE " +
                 "pm.receiver.id = :receiverId " +
@@ -58,10 +56,10 @@ interface PrivateMessageRepository : JpaRepository<PrivateMessage, Long> {
                 "AND pm.sendTime >= :sinceTime " +
                 "ORDER BY pm.sendTime ASC"
     )
-    fun findMessagesSinceTime(
+    fun findMessagesSinceTimePage(
         receiverId: Long,
         senderId: Long,
         sinceTime: java.time.LocalDateTime,
         pageable: Pageable
-    ): List<PrivateMessage>
+    ): Page<PrivateMessage>
 }

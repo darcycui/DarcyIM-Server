@@ -6,6 +6,7 @@ data class ReceiverMessageReadStatusMarkInputDTO(
     val targetId: Long = 0L,
     val targetName: String = "",
     val msgIds: List<String> = listOf(),
+    val conversationId: Long = 1,
     val conversationType: Int = 1,
     val clientType: String = "",
     val deviceId: String = ""

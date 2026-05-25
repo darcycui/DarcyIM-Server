@@ -11,5 +11,5 @@ interface IMessageReadApi {
     fun receiverMarkMessagesAsRead(@RequestParam params: Map<String, String>): String
 
     @PostMapping("/sender/sync/offline")
-    fun senderSyncOfflineMessageStatus(@RequestParam params: Map<String, String>): String
+    fun senderSyncOfflineMessageReadStatus(@RequestParam params: Map<String, String>): String
 }
