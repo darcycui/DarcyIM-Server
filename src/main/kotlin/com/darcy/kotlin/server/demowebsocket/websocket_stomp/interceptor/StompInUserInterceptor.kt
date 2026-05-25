@@ -58,6 +58,8 @@ class StompInUserInterceptor @Autowired constructor(
                 StompCommand.DISCONNECT -> {
                     val userId = user?.name ?: ""
                     DarcyLogger.info("$TAG 用户$userId 下线了")
+                    // 更新用户的最后活跃时间（即离线时间）
+                    userService.updateLastActiveTime(userId)
                     userCount()
                 }
 

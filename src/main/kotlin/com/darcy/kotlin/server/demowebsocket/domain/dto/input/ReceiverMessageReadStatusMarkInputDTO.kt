@@ -1,6 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.domain.dto.input
 
-data class MessageReadStatusInputDTO(
+data class ReceiverMessageReadStatusMarkInputDTO(
     val userId: Long = 0L,
     val fromUserName : String = "",
     val targetId: Long = 0L,

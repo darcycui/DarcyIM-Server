@@ -3,11 +3,13 @@ package com.darcy.kotlin.server.demowebsocket.http.service
 import com.darcy.kotlin.server.demowebsocket.domain.table.User
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.repository.UserRepository
+import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.utils.PasswordUtil
 import com.darcy.kotlin.server.demowebsocket.utils.UUIdGenerator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -76,5 +78,13 @@ class UserService @Autowired constructor(
 
     fun queryJwtTokenVersionByUsername(username: String): Int {
         return userRepository.readTokenVersionByUsername(username) ?: 0
+    }
+
+    fun updateLastActiveTime(username: String) {
+        val user = userRepository.findByUsername(username)
+            ?: throw UserException.USER_NOT_EXIST
+        user.lastActiveTime = LocalDateTime.now()
+        userRepository.save(user)
+        DarcyLogger.info("更新用户最后活跃时间: username=$username, time=${user.lastActiveTime}")
     }
 }

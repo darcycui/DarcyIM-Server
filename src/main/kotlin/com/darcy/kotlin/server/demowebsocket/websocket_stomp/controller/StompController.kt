@@ -1,6 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.controller
 
-import com.darcy.kotlin.server.demowebsocket.domain.dto.input.MessageReadStatusInputDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverMessageReadStatusMarkInputDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.exception.code1000.X3DHException
@@ -47,13 +47,13 @@ class StompController @Autowired constructor(
         stompService.sendTargetGroup(groupMessage)
     }
 
-    override fun markMessageRead(sha: SimpMessageHeaderAccessor, messageReadStatusInputDTO: MessageReadStatusInputDTO) {
-        val userId = messageReadStatusInputDTO.userId
-        val msgIds = messageReadStatusInputDTO.msgIds
+    override fun markMessageRead(sha: SimpMessageHeaderAccessor, receiverMessageReadStatusMarkInputDTO: ReceiverMessageReadStatusMarkInputDTO) {
+        val userId = receiverMessageReadStatusMarkInputDTO.userId
+        val msgIds = receiverMessageReadStatusMarkInputDTO.msgIds
         val updatedCount = messageReadStatusService.receiverMarkMessagesAsRead(userId, msgIds)
         val result = messageReadStatusService.receiverGetMessageListReadStatus(userId, msgIds)
         websocket.convertAndSendToUser(
-            messageReadStatusInputDTO.targetName,
+            receiverMessageReadStatusMarkInputDTO.targetName,
             "/queue/message/read",
             result
         )

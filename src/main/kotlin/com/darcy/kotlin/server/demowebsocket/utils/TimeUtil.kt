@@ -21,6 +21,7 @@ object TimeUtil {
             try {
                 return LocalDateTime.parse(dateStr, format)
             } catch (e: Exception) {
+                e.printStackTrace()
                 continue
             }
         }
@@ -42,7 +43,7 @@ object TimeUtil {
         return formatDateTimeToString(now)
     }
 
-    private fun defaultDateTime(): LocalDateTime {
+    fun defaultDateTime(): LocalDateTime {
         return LocalDateTime.of(1970, 1, 1, 0, 0, 0)
     }
 }

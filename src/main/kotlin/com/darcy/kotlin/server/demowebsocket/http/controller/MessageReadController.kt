@@ -3,7 +3,8 @@ package com.darcy.kotlin.server.demowebsocket.http.controller
 import com.alibaba.fastjson2.JSON
 import com.darcy.kotlin.server.demowebsocket.api.IMessageReadApi
 import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
-import com.darcy.kotlin.server.demowebsocket.domain.dto.input.MessageReadStatusInputDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverMessageReadStatusMarkInputDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverOfflineMessageSyncInputDTO
 import com.darcy.kotlin.server.demowebsocket.exception.code600.ParamsException
 import com.darcy.kotlin.server.demowebsocket.http.service.MessageReadStatusService
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,40 +16,67 @@ class MessageReadController @Autowired constructor(
     private val messageReadStatusService: MessageReadStatusService,
     private val websocket: SimpMessagingTemplate
 ) : IMessageReadApi {
-    override fun receiverGetUnreadMessageListByConversation(params: Map<String, String>): String {
+    // 新增：接收方离线消息同步
+    override fun receiverPullOfflineMessages(params: Map<String, String>): String {
         val userId = params["userId"]?.toLongOrNull()
             ?: throw ParamsException.ParamsNotValid(mapOf("userId" to "用户ID不能为空"))
         val targetId = params["targetId"]?.toLongOrNull()
             ?: throw ParamsException.ParamsNotValid(mapOf("targetId" to "目标ID不能为空"))
-        val result = messageReadStatusService.receiverGetUnreadMessageListByConversation(userId, targetId)
+        val conversationType = params["conversationType"]?.toIntOrNull()
+            ?: throw ParamsException.ParamsNotValid(mapOf("conversationType" to "会话类型不能为空"))
+        val input = ReceiverOfflineMessageSyncInputDTO(
+            userId = userId,
+            targetId = targetId,
+            conversationType = conversationType,
+            lastMsgId = params["lastMsgId"],
+            lastSyncTime = params["lastSyncTime"],
+            limit = params["limit"]?.toIntOrNull() ?: 50,
+            deviceId = params["deviceId"] ?: "",
+            clientType = params["clientType"] ?: ""
+        )
+
+        val result = messageReadStatusService.receiverSyncOfflineMessages(input)
         return ResultEntity.success(result).toJsonString()
     }
+
 
     override fun receiverMarkMessagesAsRead(params: Map<String, String>): String {
         val messageReadStatusInputDTOStr = params["messageReadStatusInputDTO"]
             ?: throw ParamsException.ParamsNotValid(mapOf("messageReadStatusInputDTO" to "消息参数不能为空"))
-        val messageReadStatusInputDTO =
-            JSON.parseObject(messageReadStatusInputDTOStr, MessageReadStatusInputDTO::class.java)
+        val receiverMessageReadStatusMarkInputDTO =
+            JSON.parseObject(messageReadStatusInputDTOStr, ReceiverMessageReadStatusMarkInputDTO::class.java)
                 ?: throw ParamsException.ParamsNotValid(mapOf("messageReadStatusInputDTO" to "消息参数格式错误"))
-        val userId = messageReadStatusInputDTO.userId
-        val msgIds = messageReadStatusInputDTO.msgIds
+        val userId = receiverMessageReadStatusMarkInputDTO.userId
+        val msgIds = receiverMessageReadStatusMarkInputDTO.msgIds
         val updatedCount = messageReadStatusService.receiverMarkMessagesAsRead(userId, msgIds)
         val result = messageReadStatusService.receiverGetMessageListReadStatus(userId, msgIds)
         websocket.convertAndSendToUser(
-            messageReadStatusInputDTO.targetName,
+            receiverMessageReadStatusMarkInputDTO.targetName,
             "/queue/message/read",
             result
         )
         return ResultEntity.success(result).toJsonString()
     }
 
-    override fun senderSyncMessageStatus(params: Map<String, String>): String {
+    // 新增：发送方离线已读状态同步
+    override fun senderSyncOfflineMessageStatus(params: Map<String, String>): String {
         val userId = params["userId"]?.toLongOrNull()
             ?: throw ParamsException.ParamsNotValid(mapOf("userId" to "用户ID不能为空"))
         val targetId = params["targetId"]?.toLongOrNull()
             ?: throw ParamsException.ParamsNotValid(mapOf("targetId" to "目标ID不能为空"))
-        val result = messageReadStatusService.senderSyncMessageReadStatus(userId, targetId)
+        // 离线开始时间
+        var since = params["since"]
+        if (since?.isEmpty() == true) {
+            since = null
+        }
+        // 离线结束时间 (通常是当前时间)
+        var until = params["until"]
+        if (until?.isEmpty() == true) {
+            until = null
+        }
+        val result = messageReadStatusService.senderSyncOfflineMessageReadStatus(
+            userId, targetId, since, until
+        )
         return ResultEntity.success(result).toJsonString()
     }
-
 }
