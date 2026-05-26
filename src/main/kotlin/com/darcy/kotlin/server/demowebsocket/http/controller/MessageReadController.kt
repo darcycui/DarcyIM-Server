@@ -40,7 +40,7 @@ class MessageReadController @Autowired constructor(
             clientType = params["clientType"] ?: ""
         )
 
-        val result = messageReadStatusService.receiverSyncOfflineMessages(input)
+        val result = messageReadStatusService.receiverPullOfflineMessages(input)
         return ResultEntity.success(result.toDTO()).toJsonString()
     }
 

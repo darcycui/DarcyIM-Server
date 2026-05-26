@@ -94,7 +94,7 @@ class MessageReadStatusService @Autowired constructor(
      * 支持标准分页、增量同步
      */
     @Transactional(readOnly = true)
-    fun receiverSyncOfflineMessages(input: ReceiverOfflineMessageSyncInputDTO): Page<PrivateMessage> {
+    fun receiverPullOfflineMessages(input: ReceiverOfflineMessageSyncInputDTO): Page<PrivateMessage> {
         val userId = input.userId
         val targetId = input.targetId
         val page = (input.page ?: 1) - 1  // 客户端页码从1开始 Page默认从0开始 这里需要转换索引
