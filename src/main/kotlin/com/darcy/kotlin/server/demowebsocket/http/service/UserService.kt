@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.UUID
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class UserService @Autowired constructor(
@@ -86,5 +87,11 @@ class UserService @Autowired constructor(
         user.lastActiveTime = LocalDateTime.now()
         userRepository.save(user)
         DarcyLogger.info("更新用户最后活跃时间: username=$username, time=${user.lastActiveTime}")
+    }
+
+    fun queryLastActiveTime(userId: Long): LocalDateTime? {
+        val user = userRepository.findById(userId).getOrNull()
+            ?: throw UserException.USER_NOT_EXIST
+        return user.lastActiveTime
     }
 }

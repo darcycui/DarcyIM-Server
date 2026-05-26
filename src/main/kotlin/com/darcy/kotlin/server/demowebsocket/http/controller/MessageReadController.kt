@@ -59,6 +59,7 @@ class MessageReadController @Autowired constructor(
         val msgIds = receiverMessageReadStatusMarkInputDTO.msgIds
         val updatedCount = messageReadStatusService.receiverMarkMessagesAsRead(userId, msgIds)
         val result = messageReadStatusService.receiverGetMessageListReadStatus(userId, msgIds)
+        // websocket 发送已读状态
         websocket.convertAndSendToUser(
             receiverMessageReadStatusMarkInputDTO.targetName,
             "/queue/message/read",
