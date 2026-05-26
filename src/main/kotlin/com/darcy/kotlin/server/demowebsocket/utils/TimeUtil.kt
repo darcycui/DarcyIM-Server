@@ -5,9 +5,9 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 object TimeUtil {
-    private const val TIME_FORMATTER_1: String = "yyyy-MM-dd HH:mm:ss"
-    private const val TIME_FORMATTER_2: String = "yyyy-MM-dd'T'HH:mm:ss"
-    private const val TIME_FORMATTER_3: String = "yyyy/MM/dd HH:mm:ss"
+    private const val TIME_FORMATTER_1: String = "yyyy-MM-dd HH:mm:ss.SSS"
+    private const val TIME_FORMATTER_2: String = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+    private const val TIME_FORMATTER_3: String = "yyyy/MM/dd HH:mm:ss.SSS"
 
     fun parseStringToDateTime(dateStr: String): LocalDateTime {
         val formats = listOf(
