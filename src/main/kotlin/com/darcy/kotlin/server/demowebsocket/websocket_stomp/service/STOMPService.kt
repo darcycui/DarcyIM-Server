@@ -26,8 +26,8 @@ class STOMPService @Autowired constructor(
         privateMessage: PrivateMessageDTO,
         fromUserId: String,
         dhPublicKey: String,
-        sendingIndex: Long,
-        receivingIndex: Long
+        N: Long,
+        PN: Long
     ) {
         val recipient = privateMessage.receiverName
         kotlin.runCatching {
@@ -35,12 +35,14 @@ class STOMPService @Autowired constructor(
                 mapOf(
                     "fromUserId" to fromUserId,
                     "dhPublicKey" to dhPublicKey,
-                    "sendingIndex" to sendingIndex,
-                    "receivingIndex" to receivingIndex,
+                    "N" to N,
+                    "PN" to PN,
                 )
             val sendUser = userService.queryUserById(privateMessage.senderId)
             val receiveUser = userService.queryUserById(privateMessage.receiverId)
-            val savedMessage = privateMessageService.createMessage(privateMessage.toEntity(sendUser, receiveUser))
+            val savedMessage = privateMessageService.createMessage(
+                privateMessage.toEntity(sendUser, receiveUser)
+            )
             DarcyLogger.info("保存消息: msgId=${savedMessage.msgId} receiverId=${privateMessage.receiverId}")
             messageReadStatusService.senderCreateOrUpdateReadStatus(
                 msgId = savedMessage.msgId,

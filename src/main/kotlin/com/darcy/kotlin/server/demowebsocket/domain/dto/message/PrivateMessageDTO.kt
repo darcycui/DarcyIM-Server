@@ -2,7 +2,6 @@ package com.darcy.kotlin.server.demowebsocket.domain.dto.message
 
 import com.darcy.kotlin.server.demowebsocket.domain.table.User
 import com.darcy.kotlin.server.demowebsocket.domain.table.message.PrivateMessage
-import com.darcy.kotlin.server.demowebsocket.utils.UUIdGenerator
 import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil
 import org.springframework.data.domain.Page
 import java.time.LocalDateTime
@@ -17,7 +16,10 @@ data class PrivateMessageDTO(
     val msgType: String = "TEXT",
     val sendTime: String = TimeUtil.formatDateTimeToString(LocalDateTime.now()),
     val isRead: Boolean = false,
-    val isRecalled: Boolean = false
+    val isRecalled: Boolean = false,
+    val dhPublicKey: String = "",
+    val nKey: Long = 0L,
+    val pnKey: Long = 0L
 )
 
 fun PrivateMessage.toDTO(): PrivateMessageDTO {
@@ -31,7 +33,10 @@ fun PrivateMessage.toDTO(): PrivateMessageDTO {
         msgType = this.msgType.name,
         sendTime = TimeUtil.formatDateTimeToString(this.sendTime),
         isRead = this.isRead,
-        isRecalled = this.isRecalled
+        isRecalled = this.isRecalled,
+        dhPublicKey = this.dhPublicKey,
+        nKey = this.nKey,
+        pnKey = this.pnKey
     )
 }
 
@@ -54,5 +59,8 @@ fun PrivateMessageDTO.toEntity(
         content = this.content,
         msgType = PrivateMessage.MessageType.valueOf(this.msgType),
         sendTime = TimeUtil.parseStringToDateTime(this.sendTime),
+        dhPublicKey = this.dhPublicKey,
+        nKey = this.nKey,
+        pnKey = this.pnKey
     )
 }

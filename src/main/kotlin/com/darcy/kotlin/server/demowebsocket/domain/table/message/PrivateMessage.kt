@@ -89,7 +89,17 @@ open class PrivateMessage(
     open var clientType: String = "",
 
     @Column(name = "client_version", length = 20)
-    open var clientVersion: String = ""
+    open var clientVersion: String = "",
+
+    // 添加三个字段
+    @Column(name = "dh_public_key", length = 128)
+    open var dhPublicKey: String = "",
+
+    @Column(name = "n_key")
+    open var nKey: Long = 0L,
+
+    @Column(name = "pn_key")
+    open var pnKey: Long = 0L
 ) : BaseEntity() {
     // 序列化时 只保留 sender User 的 id
     @get:JSONField(name = "senderId")

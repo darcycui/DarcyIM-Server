@@ -81,7 +81,6 @@ class MessageReadStatusService @Autowired constructor(
         }
         val sinceTime = TimeUtil.parseStringToDateTime(actualSince)
         val untilTime = until?.let { TimeUtil.parseStringToDateTime(it) } ?: LocalDateTime.now()
-
         return messageReadStatusRepository.senderFindReadMessageListByConversationWithTimeRange(
             userId, targetId, sinceTime, untilTime
         ).toDTO()
@@ -100,7 +99,6 @@ class MessageReadStatusService @Autowired constructor(
         val page = (input.page ?: 1) - 1  // 客户端页码从1开始 Page默认从0开始 这里需要转换索引
         val size = if (input.size in 1..100) input.size ?: 50 else 50
         val pageable = PageRequest.of(page, size)
-
         DarcyLogger.info("接收方离线同步: userId=$userId, targetId=$targetId, page=$page, size=$size")
 
         // 根据参数选择不同的查询策略
@@ -114,9 +112,7 @@ class MessageReadStatusService @Autowired constructor(
             privateMessageRepository.findMessagesSinceTimePage(
                 userId, targetId, sinceTime, pageable
             )
-
         DarcyLogger.info("离线同步完成: totalElements=${messagesPage.totalElements}, totalPages=${messagesPage.totalPages}, currentPage=${messagesPage.content.size}")
-
         return messagesPage
     }
 }

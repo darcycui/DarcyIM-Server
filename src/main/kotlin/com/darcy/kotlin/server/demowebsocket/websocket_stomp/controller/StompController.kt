@@ -26,11 +26,11 @@ class StompController @Autowired constructor(
         DarcyLogger.info("private sender: $sender message=$privateMessage")
         val dhPublicKey = sha.getFirstNativeHeader("dhPublicKey") ?: ""
         val fromUserId = sha.getFirstNativeHeader("fromUserId") ?: throw X3DHException.FROM_USER_ID_HEADER_NOT_EXIST
-        val sendingIndex = sha.getFirstNativeHeader("sendingIndex")?.toLongOrNull()
+        val N = sha.getFirstNativeHeader("N_KEY")?.toLongOrNull()
             ?: throw X3DHException.SENDING_INDEX_HEADER_NOT_EXIST
-        val receivingIndex = sha.getFirstNativeHeader("receivingIndex")?.toLongOrNull()
+        val PN = sha.getFirstNativeHeader("PN_KEY")?.toLongOrNull()
             ?: throw X3DHException.RECEIVING_INDEX_HEADER_NOT_EXIST
-        stompService.sendPrivate(privateMessage, fromUserId, dhPublicKey, sendingIndex, receivingIndex)
+        stompService.sendPrivate(privateMessage, fromUserId, dhPublicKey, N, PN)
     }
 
     override fun sendAllGroup(sha: SimpMessageHeaderAccessor, @Payload groupMessage: GroupMessageDTO) {
