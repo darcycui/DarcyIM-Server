@@ -35,13 +35,13 @@ class STOMPService @Autowired constructor(
                 mapOf(
                     "fromUserId" to fromUserId,
                     "dhPublicKey" to dhPublicKey,
-                    "N" to N,
-                    "PN" to PN,
+                    "N_KEY" to N,
+                    "PN_KEY" to PN,
                 )
             val sendUser = userService.queryUserById(privateMessage.senderId)
             val receiveUser = userService.queryUserById(privateMessage.receiverId)
             val savedMessage = privateMessageService.createMessage(
-                privateMessage.toEntity(sendUser, receiveUser)
+                privateMessage.toEntity(sendUser, receiveUser, dhPublicKey, N, PN)
             )
             DarcyLogger.info("保存消息: msgId=${savedMessage.msgId} receiverId=${privateMessage.receiverId}")
             messageReadStatusService.senderCreateOrUpdateReadStatus(

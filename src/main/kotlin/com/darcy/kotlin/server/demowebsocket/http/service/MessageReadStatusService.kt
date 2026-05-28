@@ -96,7 +96,7 @@ class MessageReadStatusService @Autowired constructor(
     fun receiverPullOfflineMessages(input: ReceiverOfflineMessageSyncInputDTO): Page<PrivateMessage> {
         val userId = input.userId
         val targetId = input.targetId
-        val page = (input.page ?: 1) - 1  // 客户端页码从1开始 Page默认从0开始 这里需要转换索引
+        val page = (input.page ?: 1) - 1  // 客户端页码从1开始 服务端Page默认从0开始 这里需要转换索引
         val size = if (input.size in 1..100) input.size ?: 50 else 50
         val pageable = PageRequest.of(page, size)
         DarcyLogger.info("接收方离线同步: userId=$userId, targetId=$targetId, page=$page, size=$size")

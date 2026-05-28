@@ -50,7 +50,10 @@ fun Page<PrivateMessage>.toDTO(): Page<PrivateMessageDTO> {
 
 fun PrivateMessageDTO.toEntity(
     sender: User,
-    receiver: User
+    receiver: User,
+    dhPublicKey: String,
+    N: Long,
+    PN: Long
 ): PrivateMessage {
     return PrivateMessage(
         msgId = this.msgId,
@@ -59,8 +62,8 @@ fun PrivateMessageDTO.toEntity(
         content = this.content,
         msgType = PrivateMessage.MessageType.valueOf(this.msgType),
         sendTime = TimeUtil.parseStringToDateTime(this.sendTime),
-        dhPublicKey = this.dhPublicKey,
-        nKey = this.nKey,
-        pnKey = this.pnKey
+        dhPublicKey = dhPublicKey,
+        nKey = N,
+        pnKey = PN
     )
 }

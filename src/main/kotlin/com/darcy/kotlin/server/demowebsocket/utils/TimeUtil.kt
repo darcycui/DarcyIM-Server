@@ -11,21 +11,21 @@ object TimeUtil {
 
     fun parseStringToDateTime(dateStr: String): LocalDateTime {
         val formats = listOf(
-            DateTimeFormatter.ISO_LOCAL_DATE_TIME,
             DateTimeFormatter.ofPattern(TIME_FORMATTER_1),
             DateTimeFormatter.ofPattern(TIME_FORMATTER_2),
-            DateTimeFormatter.ofPattern(TIME_FORMATTER_3)
+            DateTimeFormatter.ofPattern(TIME_FORMATTER_3),
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME,
         )
 
         for (format in formats) {
             try {
                 return LocalDateTime.parse(dateStr, format)
             } catch (e: Exception) {
-                e.printStackTrace()
+                // e.printStackTrace()
                 continue
             }
         }
-        DarcyLogger.debug("无法解析日期时间格式: $dateStr")
+        DarcyLogger.error("无法解析日期时间格式: $dateStr")
         return defaultDateTime()
     }
 

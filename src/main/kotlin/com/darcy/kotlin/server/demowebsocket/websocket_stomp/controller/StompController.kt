@@ -27,9 +27,9 @@ class StompController @Autowired constructor(
         val dhPublicKey = sha.getFirstNativeHeader("dhPublicKey") ?: ""
         val fromUserId = sha.getFirstNativeHeader("fromUserId") ?: throw X3DHException.FROM_USER_ID_HEADER_NOT_EXIST
         val N = sha.getFirstNativeHeader("N_KEY")?.toLongOrNull()
-            ?: throw X3DHException.SENDING_INDEX_HEADER_NOT_EXIST
+            ?: throw X3DHException.N_KEY_HEADER_NOT_EXIST
         val PN = sha.getFirstNativeHeader("PN_KEY")?.toLongOrNull()
-            ?: throw X3DHException.RECEIVING_INDEX_HEADER_NOT_EXIST
+            ?: throw X3DHException.PN_KEY_HEADER_NOT_EXIST
         stompService.sendPrivate(privateMessage, fromUserId, dhPublicKey, N, PN)
     }
 
