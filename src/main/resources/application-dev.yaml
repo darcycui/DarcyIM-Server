@@ -16,8 +16,8 @@ spring:
     allow-bean-definition-overriding: true
   datasource:
     url: jdbc:mysql://localhost:3306/mydatabase?useSSL=false&serverTimezone=Asia/Shanghai&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
-    password: 123456
-#    password: 123456@123
+#    password: 123456
+    password: 123456@123
     username: root
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
