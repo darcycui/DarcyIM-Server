@@ -96,4 +96,17 @@ class PrivateMessageService @Autowired constructor(
     fun deleteByUserIdAndFriendId(userId: Long, friendId: Long): Int {
         return privateMessageRepository.deleteByUserIdAndFriendId(userId, friendId)
     }
+
+    fun queryAllByMsgIdList(unreadMsgIds: List<String>, pageable: PageRequest): Page<PrivateMessage> {
+        return privateMessageRepository.findAllByMsgIdList(unreadMsgIds, pageable)
+    }
+
+    fun queryMessagesSinceTimestamp(
+        userId: Long,
+        targetId: Long,
+        sinceTime: LocalDateTime,
+        pageable: PageRequest
+    ): Page<PrivateMessage> {
+        return privateMessageRepository.findMessagesSinceTimestamp(userId, targetId, sinceTime, pageable)
+    }
 }

@@ -1,4 +1,4 @@
-// 新增心跳相关变量
+// 心跳相关变量
 let pingInterval = null;
 let pongTimeout = null;
 

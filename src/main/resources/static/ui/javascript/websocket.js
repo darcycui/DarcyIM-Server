@@ -60,7 +60,7 @@ function webSocketInit(self1, other1) {
         console.error("WebSocket Error:", event); // 查看完整错误对象
         console.error("WebSocket 错误详情:", {
             type: event.type,
-            error: event.error,  // 新增错误对象捕获
+            error: event.error,  // 错误对象捕获
             url: websocket.url,
             readyState: websocket.readyState
         });

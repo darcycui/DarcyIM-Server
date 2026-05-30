@@ -6,7 +6,6 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.conversation.Conversat
 import com.darcy.kotlin.server.demowebsocket.domain.table.message.MessageReadStatus
 import com.darcy.kotlin.server.demowebsocket.domain.table.message.PrivateMessage
 import com.darcy.kotlin.server.demowebsocket.http.repository.MessageReadStatusRepository
-import com.darcy.kotlin.server.demowebsocket.http.repository.PrivateMessageRepository
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +19,7 @@ import java.time.LocalDateTime
 class MessageReadStatusService @Autowired constructor(
     private val messageReadStatusRepository: MessageReadStatusRepository,
     private val userService: UserService,
-    private val privateMessageRepository: PrivateMessageRepository
+    private val privateMessageService: PrivateMessageService
 ) {
 
     @Transactional
@@ -67,7 +66,7 @@ class MessageReadStatusService @Autowired constructor(
         return messageReadStatusRepository.deleteByUserIdAndTargetId(userId, friendId)
     }
 
-    // 新增方法：支持时间范围查询离线期间的已读状态
+    // 支持时间范围查询离线期间的已读状态
     fun senderSyncOfflineMessageReadStatus(
         userId: Long,
         targetId: Long,
@@ -86,30 +85,46 @@ class MessageReadStatusService @Autowired constructor(
         ).toDTO()
     }
 
+    /**
+     * 接收方离线消息同步（核心方法）
+     * 策略：基于未读状态的分页查询
+     * 只要消息未读 可以一直查询到
+     */
+    @Transactional(readOnly = true)
+    fun receiverPullOfflineMessagesByReadStatus(input: ReceiverOfflineMessageSyncInputDTO): Page<PrivateMessage> {
+        val userId = input.userId
+        val targetId = input.targetId
+        val page = (input.page ?: 1) - 1  // 客户端页码从1开始 服务端Page默认从0开始 这里需要转换索引
+        val size = if (input.size in 1..100) input.size ?: 50 else 50
+        DarcyLogger.info("接收方离线同步 按未读状态查询: userId=$userId, targetId=$targetId, page=$page, size=$size")
+        val unreadMsgIds = messageReadStatusRepository.findUnreadMsgIdsByConversation(userId, targetId)
+        if (unreadMsgIds.isEmpty()) {
+            return Page.empty(PageRequest.of(page, size))
+        }
+        val pageable = PageRequest.of(page, size)
+        return privateMessageService.queryAllByMsgIdList(unreadMsgIds, pageable)
+    }
 
     /**
      * 接收方离线消息同步（核心方法）
-     * 参考 queryBothMessagesPageByConversation 重构为 Page<PrivateMessage>
-     * 支持标准分页、增量同步
+     * 策略：基于时间戳的分页查询
+     * 只查询指定时间之后的消息 默认从上次离线时间开始
      */
     @Transactional(readOnly = true)
-    fun receiverPullOfflineMessages(input: ReceiverOfflineMessageSyncInputDTO): Page<PrivateMessage> {
+    fun receiverPullOfflineMessagesByTimestamp(input: ReceiverOfflineMessageSyncInputDTO): Page<PrivateMessage> {
         val userId = input.userId
         val targetId = input.targetId
         val page = (input.page ?: 1) - 1  // 客户端页码从1开始 服务端Page默认从0开始 这里需要转换索引
         val size = if (input.size in 1..100) input.size ?: 50 else 50
         val pageable = PageRequest.of(page, size)
-        DarcyLogger.info("接收方离线同步: userId=$userId, targetId=$targetId, page=$page, size=$size")
+        DarcyLogger.info("接收方离线同步 按时间戳查询: userId=$userId, targetId=$targetId, page=$page, size=$size")
 
-        // 根据参数选择不同的查询策略
-        // 策略1：基于时间戳的分页查询
         val sinceTime = if (input.lastSyncTime?.isNotEmpty() == true) {
             TimeUtil.parseStringToDateTime(input.lastSyncTime)
         } else {
             userService.queryLastActiveTime(userId)
         } ?: TimeUtil.defaultDateTime()
-        val messagesPage =
-            privateMessageRepository.findMessagesSinceTimePage(
+        val messagesPage = privateMessageService.queryMessagesSinceTimestamp(
                 userId, targetId, sinceTime, pageable
             )
         DarcyLogger.info("离线同步完成: totalElements=${messagesPage.totalElements}, totalPages=${messagesPage.totalPages}, currentPage=${messagesPage.content.size}")

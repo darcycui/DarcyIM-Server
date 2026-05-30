@@ -18,7 +18,7 @@
 //        private const val INACTIVE_CHECK_INTERVAL = 10_000L
 //        private val TAG = ActiveCheckHelper::class.java.simpleName
 //
-//        // 新增最后活跃时间记录
+//        // 最后活跃时间记录
 //        @JvmStatic
 //        private val lastActiveTimeMap = ConcurrentHashMap<String, Long>()
 //
