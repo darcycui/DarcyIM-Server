@@ -1,5 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.domain.dto.message
 
+import com.alibaba.fastjson2.annotation.JSONField
 import com.darcy.kotlin.server.demowebsocket.domain.table.User
 import com.darcy.kotlin.server.demowebsocket.domain.table.message.PrivateMessage
 import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil
@@ -18,6 +19,7 @@ data class PrivateMessageDTO(
     val isRead: Boolean = false,
     val isRecalled: Boolean = false,
     val dhPublicKey: String = "",
+    @JSONField(name = "nKey")
     val nKey: Long = 0L,
     val pnKey: Long = 0L
 )
