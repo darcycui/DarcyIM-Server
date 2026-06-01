@@ -7,13 +7,11 @@ import java.time.format.DateTimeFormatter
 object TimeUtil {
     private const val TIME_FORMATTER_1: String = "yyyy-MM-dd HH:mm:ss.SSS"
     private const val TIME_FORMATTER_2: String = "yyyy-MM-dd'T'HH:mm:ss.SSS"
-    private const val TIME_FORMATTER_3: String = "yyyy/MM/dd HH:mm:ss.SSS"
 
     fun parseStringToDateTime(dateStr: String): LocalDateTime {
         val formats = listOf(
             DateTimeFormatter.ofPattern(TIME_FORMATTER_1),
             DateTimeFormatter.ofPattern(TIME_FORMATTER_2),
-            DateTimeFormatter.ofPattern(TIME_FORMATTER_3),
             DateTimeFormatter.ISO_LOCAL_DATE_TIME,
         )
 
@@ -30,7 +28,7 @@ object TimeUtil {
     }
 
     fun formatDateTimeToString(dateTime: LocalDateTime?): String {
-        val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        val formatter = DateTimeFormatter.ofPattern(TIME_FORMATTER_1)
         return if (dateTime == null) {
             defaultDateTime().format(formatter)
         } else {
