@@ -17,7 +17,7 @@ class MessageReadController @Autowired constructor(
     private val messageReadStatusService: MessageReadStatusService,
     private val websocket: SimpMessagingTemplate
 ) : IMessageReadApi {
-    // 新增：接收方离线消息同步
+    // 接收方离线消息同步
     override fun receiverPullOfflineMessages(params: Map<String, String>): String {
         val userId = params["userId"]?.toLongOrNull()
             ?: throw ParamsException.ParamsNotValid(mapOf("userId" to "用户ID不能为空"))
@@ -40,7 +40,8 @@ class MessageReadController @Autowired constructor(
             clientType = params["clientType"] ?: ""
         )
 
-        val result = messageReadStatusService.receiverPullOfflineMessages(input)
+        val result = messageReadStatusService.receiverPullOfflineMessagesByReadStatus(input)
+//        val result = messageReadStatusService.receiverPullOfflineMessagesByTimestamp(input)
         return ResultEntity.success(result.toDTO()).toJsonString()
     }
 
@@ -68,7 +69,7 @@ class MessageReadController @Autowired constructor(
         return ResultEntity.success(result).toJsonString()
     }
 
-    // 新增：发送方离线已读状态同步
+    // 发送方离线已读状态同步
     override fun senderSyncOfflineMessageReadStatus(params: Map<String, String>): String {
         val userId = params["userId"]?.toLongOrNull()
             ?: throw ParamsException.ParamsNotValid(mapOf("userId" to "用户ID不能为空"))

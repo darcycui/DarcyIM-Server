@@ -20,7 +20,6 @@ import java.time.LocalDateTime
         Index(name = "idx_receiver_sender", columnList = "receiver_id, sender_id, send_time"),
         Index(name = "idx_msg_id", columnList = "msg_id", unique = true),
         Index(name = "idx_send_time", columnList = "send_time"),
-        Index(name = "idx_is_read", columnList = "is_read, receiver_id")
     ]
 )
 @DynamicInsert
@@ -54,9 +53,6 @@ open class PrivateMessage(
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "extra_data", columnDefinition = "json")
     open var extraData: Map<String, Any> = emptyMap(),
-
-    @Column(name = "is_read", nullable = false)
-    open var isRead: Boolean = false,
 
     @Column(name = "is_recalled", nullable = false)
     open var isRecalled: Boolean = false,

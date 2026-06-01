@@ -50,7 +50,8 @@ interface MessageReadStatusRepository : JpaRepository<MessageReadStatus, Long> {
                 "ORDER BY mrs.readTime ASC"
     )
     fun senderFindReadMessageListByConversation(senderId: Long, receiverId: Long): List<MessageReadStatus>
-    // 新增方法：支持时间范围查询离线期间的已读状态
+
+    // 支持时间范围查询离线期间的已读状态
     @Query(
         "SELECT mrs FROM MessageReadStatus mrs WHERE mrs.user.id = :senderId " +
                 "AND mrs.conversationType = 'PRIVATE' " +
@@ -66,4 +67,22 @@ interface MessageReadStatusRepository : JpaRepository<MessageReadStatus, Long> {
         since: LocalDateTime,
         until: LocalDateTime
     ): List<MessageReadStatus>
+
+    // 查询某用户收到的未读消息ID列表
+    @Query(
+        "SELECT DISTINCT mrs.msgId FROM MessageReadStatus mrs WHERE " +
+                "mrs.targetId = :receiverId AND " +
+                "mrs.isRead = false"
+    )
+    fun findUnreadMsgIdsByReceiver(receiverId: Long): List<String>
+
+    // 查询与特定发送者的未读消息ID列表
+    @Query(
+        "SELECT DISTINCT mrs.msgId FROM MessageReadStatus mrs WHERE " +
+                "mrs.targetId = :receiverId AND " +
+                "mrs.user.id = :senderId AND " +
+                "mrs.isRead = false"
+    )
+    fun findUnreadMsgIdsByConversation(receiverId: Long, senderId: Long): List<String>
+
 }

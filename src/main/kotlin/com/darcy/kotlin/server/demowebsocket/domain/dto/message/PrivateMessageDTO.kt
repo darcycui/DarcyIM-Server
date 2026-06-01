@@ -16,7 +16,6 @@ data class PrivateMessageDTO(
     val content: String = "",
     val msgType: String = "TEXT",
     val sendTime: String = TimeUtil.formatDateTimeToString(LocalDateTime.now()),
-    val isRead: Boolean = false,
     val isRecalled: Boolean = false,
     val dhPublicKey: String = "",
     @JSONField(name = "nKey")
@@ -34,7 +33,6 @@ fun PrivateMessage.toDTO(): PrivateMessageDTO {
         content = this.content,
         msgType = this.msgType.name,
         sendTime = TimeUtil.formatDateTimeToString(this.sendTime),
-        isRead = this.isRead,
         isRecalled = this.isRecalled,
         dhPublicKey = this.dhPublicKey,
         nKey = this.nKey,
