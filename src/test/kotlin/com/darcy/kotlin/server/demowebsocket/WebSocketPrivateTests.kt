@@ -193,7 +193,6 @@ class WebSocketPrivateTests {
                 content = "测试消息1",
                 msgType = "TEXT",
                 sendTime = TimeUtil.getCurrentTimeString(),
-                isRead = false,
                 isRecalled = false
             )
             // 发送消息 获取返回值用于处理Receipt确认帧

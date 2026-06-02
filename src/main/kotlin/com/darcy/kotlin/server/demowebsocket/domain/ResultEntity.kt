@@ -69,6 +69,15 @@ open class ResultEntity<T>() {
         }
     }
 
+    fun toJsonStringOnlyResult(): String {
+        return JSONObject.toJSONString(
+            this.result,
+//            JSONWriter.Feature.ReferenceDetection
+        ).also {
+//            DarcyLogger.warn(it)
+        }
+    }
+
     override fun toString(): String {
         return "ResultEntity(resultcode=$resultcode, result=$result, error_code=$error_code, reason='$reason')"
     }
