@@ -2,7 +2,8 @@ package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.IFriendRequestApi
 import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
-import com.darcy.kotlin.server.demowebsocket.domain.dto.toDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.toDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.user.toDTO
 import com.darcy.kotlin.server.demowebsocket.exception.code600.ParamsException
 import com.darcy.kotlin.server.demowebsocket.http.service.FriendRequestService
 import com.darcy.kotlin.server.demowebsocket.http.service.FriendshipService
@@ -11,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class FriendRequestController @Autowired constructor(
-    val friendRequestService: FriendRequestService,
-    val friendshipService: FriendshipService,
+    private val friendRequestService: FriendRequestService,
+    private val friendshipService: FriendshipService,
 ) : IFriendRequestApi {
     override fun createFriendRequest(params: Map<String, String>): String {
         val fromUserId = params["fromUserId"]?.toLongOrNull()

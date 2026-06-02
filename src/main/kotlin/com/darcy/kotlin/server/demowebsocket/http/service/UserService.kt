@@ -1,6 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
-import com.darcy.kotlin.server.demowebsocket.domain.table.User
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.repository.UserRepository
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
@@ -10,13 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
 @Service
 class UserService @Autowired constructor(
-    val userRepository: UserRepository,
-    val passwordUtil: PasswordUtil
+   private val userRepository: UserRepository,
+   private val passwordUtil: PasswordUtil
 ) {
 
     @Transactional

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
  */
 @Service
 class CustomUserDetailsService @Autowired constructor(
-    val userRepository: UserRepository
+    private val userRepository: UserRepository
 ) : UserDetailsService {
 
     // 重写 web-security 认证方法

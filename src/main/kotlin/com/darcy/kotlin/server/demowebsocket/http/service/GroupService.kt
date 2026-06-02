@@ -1,5 +1,8 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
+import com.darcy.kotlin.server.demowebsocket.domain.dto.group.GroupDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.group.GroupMemberDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.group.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.table.conversation.Conversation
 import com.darcy.kotlin.server.demowebsocket.domain.table.group.Group
 import com.darcy.kotlin.server.demowebsocket.domain.table.group.GroupMember
@@ -77,6 +80,11 @@ class GroupService @Autowired constructor(
 
     @Transactional
     fun queryGroupById(id: Long): Group {
+        return queryGroupByIdDB(id)
+    }
+
+    @Transactional
+    fun queryGroupByIdDB(id: Long): Group {
         val group = groupRepository.findById(id)
         if (group.isEmpty) throw GroupException.GROUP_NOT_EXIST
         return group.get()
@@ -84,7 +92,7 @@ class GroupService @Autowired constructor(
 
     @Transactional
     fun inviteToGroup(inviterId: Long, inviteeId: Long, groupId: Long): GroupMember {
-        val group = queryGroupById(groupId)
+        val group = queryGroupByIdDB(groupId)
         val inviter = userService.queryUserById(inviterId)
         val invitee = userService.queryUserById(inviteeId)
         // 邀请记录

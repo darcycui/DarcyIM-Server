@@ -3,8 +3,8 @@ package com.darcy.kotlin.server.demowebsocket.http.controller
 import com.alibaba.fastjson2.JSON
 import com.darcy.kotlin.server.demowebsocket.api.IRegisterApi
 import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
-import com.darcy.kotlin.server.demowebsocket.domain.dto.toDTO
-import com.darcy.kotlin.server.demowebsocket.domain.table.User
+import com.darcy.kotlin.server.demowebsocket.domain.dto.user.toDTO
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import com.darcy.kotlin.server.demowebsocket.exception.code600.ParamsException
 import com.darcy.kotlin.server.demowebsocket.http.service.*
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger

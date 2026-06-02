@@ -1,6 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.http.repository
 
-import com.darcy.kotlin.server.demowebsocket.domain.table.User
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 

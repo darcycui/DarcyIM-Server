@@ -1,5 +1,7 @@
-package com.darcy.kotlin.server.demowebsocket.domain.table
+package com.darcy.kotlin.server.demowebsocket.domain.table.device
 
+import com.darcy.kotlin.server.demowebsocket.domain.table.BaseEntity
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import jakarta.persistence.*
 import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate

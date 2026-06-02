@@ -1,6 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.domain.dto.message
 
-import com.darcy.kotlin.server.demowebsocket.domain.table.User
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import com.darcy.kotlin.server.demowebsocket.domain.table.group.Group
 import com.darcy.kotlin.server.demowebsocket.domain.table.message.GroupMessage
 import com.darcy.kotlin.server.demowebsocket.utils.UUIdGenerator

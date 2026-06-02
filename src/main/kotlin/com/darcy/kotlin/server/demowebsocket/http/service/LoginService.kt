@@ -1,7 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
 import com.darcy.kotlin.server.demowebsocket.config.jwt.JwtTokenProvider
-import com.darcy.kotlin.server.demowebsocket.domain.table.User
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.utils.PasswordUtil
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LoginService @Autowired constructor(
-    val jwtTokenProvider: JwtTokenProvider,
-    val userService: UserService,
-    val passwordUtil: PasswordUtil
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val userService: UserService,
+    private val passwordUtil: PasswordUtil
 ) {
 
     @Transactional

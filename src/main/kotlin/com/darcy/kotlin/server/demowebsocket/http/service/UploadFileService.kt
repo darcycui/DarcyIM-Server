@@ -18,8 +18,8 @@ import java.nio.file.Paths
 
 @Service
 class UploadFileService @Autowired constructor(
-    val fileRepository: FileRepository,
-    val uploadFileRepository: UploadFileRepository
+    private val fileRepository: FileRepository,
+    private val uploadFileRepository: UploadFileRepository
 ) {
     // @Value注解注入了文件保存路径uploadPath 配置在application.properties或application.yml文件中
     @Value("\${upload.path.image}")

@@ -58,8 +58,8 @@ class MessageReadStatusService @Autowired constructor(
         return updatedCount
     }
 
-    fun receiverGetMessageListReadStatus(userId: Long, msgIds: List<String>): MessageReadStatusDTO {
-        return messageReadStatusRepository.receiverFindByUserIdAndMsgIdList(userId, msgIds).toDTO()
+    fun receiverGetMessageListReadStatus(userId: Long, msgIds: List<String>): List<MessageReadStatus> {
+        return messageReadStatusRepository.receiverFindByUserIdAndMsgIdList(userId, msgIds)
     }
 
     fun deleteByUserIdAndTargetId(userId: Long, friendId: Long): Int {
@@ -72,7 +72,7 @@ class MessageReadStatusService @Autowired constructor(
         targetId: Long,
         since: String?,
         until: String?
-    ): MessageReadStatusDTO {
+    ): List<MessageReadStatus> {
         // 如果客户端没有提供 since，则从用户表中获取 lastActiveTime
         val actualSince = since ?: run {
             val user = userService.queryUserById(userId)
@@ -82,7 +82,7 @@ class MessageReadStatusService @Autowired constructor(
         val untilTime = until?.let { TimeUtil.parseStringToDateTime(it) } ?: LocalDateTime.now()
         return messageReadStatusRepository.senderFindReadMessageListByConversationWithTimeRange(
             userId, targetId, sinceTime, untilTime
-        ).toDTO()
+        )
     }
 
     /**

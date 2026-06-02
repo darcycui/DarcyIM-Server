@@ -1,7 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket
 
-import com.darcy.kotlin.server.demowebsocket.domain.table.User
-import com.darcy.kotlin.server.demowebsocket.domain.table.User.UserStatus
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User.UserStatus
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc

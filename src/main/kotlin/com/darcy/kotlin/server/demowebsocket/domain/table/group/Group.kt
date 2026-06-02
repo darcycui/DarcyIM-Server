@@ -1,9 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.domain.table.group
 
 import com.darcy.kotlin.server.demowebsocket.domain.table.BaseEntity
-import com.darcy.kotlin.server.demowebsocket.domain.table.User
-import com.darcy.kotlin.server.demowebsocket.domain.table.media.UploadFile.FileType
-import com.darcy.kotlin.server.demowebsocket.domain.table.media.UploadFile.FileType.OTHER
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import jakarta.persistence.*
 import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate

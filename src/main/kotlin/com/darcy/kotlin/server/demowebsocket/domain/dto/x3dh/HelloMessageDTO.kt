@@ -1,6 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh
 
-import com.darcy.kotlin.server.demowebsocket.domain.table.User
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import com.darcy.kotlin.server.demowebsocket.domain.table.x3dh.HelloMessage
 import org.springframework.data.domain.Page
 import java.time.LocalDateTime

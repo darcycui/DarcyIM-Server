@@ -1,5 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
+import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.FriendRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.table.friend.FriendRequest
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.repository.FriendRequestRepository
@@ -10,9 +12,9 @@ import java.time.LocalDateTime
 
 @Service
 class FriendRequestService @Autowired constructor(
-    val friendRequestRepository: FriendRequestRepository,
-    val userService: UserService,
-    val friendshipService: FriendshipService
+    private val friendRequestRepository: FriendRequestRepository,
+    private val userService: UserService,
+    private val friendshipService: FriendshipService
 ) {
 
     @Transactional

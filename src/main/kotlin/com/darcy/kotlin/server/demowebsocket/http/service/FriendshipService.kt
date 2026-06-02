@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
-import com.darcy.kotlin.server.demowebsocket.domain.dto.SimpleJsonDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.FriendshipDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.table.friend.Friendship
 import com.darcy.kotlin.server.demowebsocket.http.repository.FriendshipRepository
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
@@ -56,7 +57,7 @@ class FriendshipService @Autowired constructor(
     }
 
     @Transactional
-    fun deleteFriendship(userId: Long, friendId: Long): SimpleJsonDTO {
+    fun deleteFriendship(userId: Long, friendId: Long): String {
         val friendshipDeleteCount = friendshipRepository.deleteByUserIdAndFriendId(userId, friendId)
         DarcyLogger.info("friendshipDeleteCount-->$friendshipDeleteCount")
         val friendRequestDeleteCount = friendRequestService.deleteByUserIdAndFriendId(userId, friendId)
@@ -74,9 +75,9 @@ class FriendshipService @Autowired constructor(
             && privateMessageDeleteCount >= 0
             && conversationDeleteCount >= 0
         ) {
-            SimpleJsonDTO("删除成功")
+            "删除成功"
         } else {
-            SimpleJsonDTO("删除失败")
+            "删除失败"
         }
     }
 }

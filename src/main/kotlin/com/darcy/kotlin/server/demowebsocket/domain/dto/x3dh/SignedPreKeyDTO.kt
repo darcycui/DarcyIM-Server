@@ -1,7 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh
 
-import com.darcy.kotlin.server.demowebsocket.domain.table.Device
-import com.darcy.kotlin.server.demowebsocket.domain.table.User
+import com.darcy.kotlin.server.demowebsocket.domain.table.device.Device
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import com.darcy.kotlin.server.demowebsocket.domain.table.x3dh.SignedPreKey
 import java.time.LocalDateTime
 

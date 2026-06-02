@@ -3,6 +3,7 @@ package com.darcy.kotlin.server.demowebsocket.http.controller
 import com.alibaba.fastjson2.JSON
 import com.darcy.kotlin.server.demowebsocket.api.IMessageReadApi
 import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
+import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverMessageReadStatusMarkInputDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverOfflineMessageSyncInputDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.toDTO
@@ -64,9 +65,9 @@ class MessageReadController @Autowired constructor(
         websocket.convertAndSendToUser(
             receiverMessageReadStatusMarkInputDTO.targetName,
             "/queue/message/read",
-            result
+            result.toDTO()
         )
-        return ResultEntity.success(result).toJsonString()
+        return ResultEntity.success(result.toDTO()).toJsonString()
     }
 
     // 发送方离线已读状态同步
@@ -90,6 +91,6 @@ class MessageReadController @Autowired constructor(
         val result = messageReadStatusService.senderSyncOfflineMessageReadStatus(
             userId, targetId, since, until
         )
-        return ResultEntity.success(result).toJsonString()
+        return ResultEntity.success(result.toDTO()).toJsonString()
     }
 }

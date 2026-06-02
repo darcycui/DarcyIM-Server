@@ -1,6 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.domain.dto.group
 
-import com.darcy.kotlin.server.demowebsocket.domain.table.User
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import com.darcy.kotlin.server.demowebsocket.domain.table.group.Group
 import com.darcy.kotlin.server.demowebsocket.domain.table.group.GroupMember
 import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil

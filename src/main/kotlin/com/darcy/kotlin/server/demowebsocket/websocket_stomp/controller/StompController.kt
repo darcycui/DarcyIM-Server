@@ -3,6 +3,7 @@ package com.darcy.kotlin.server.demowebsocket.websocket_stomp.controller
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverMessageReadStatusMarkInputDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.message.toDTO
 import com.darcy.kotlin.server.demowebsocket.exception.code1000.X3DHException
 import com.darcy.kotlin.server.demowebsocket.http.service.MessageReadStatusService
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
@@ -55,7 +56,7 @@ class StompController @Autowired constructor(
         websocket.convertAndSendToUser(
             receiverMessageReadStatusMarkInputDTO.targetName,
             "/queue/message/read",
-            result
+            result.toDTO()
         )
     }
 }

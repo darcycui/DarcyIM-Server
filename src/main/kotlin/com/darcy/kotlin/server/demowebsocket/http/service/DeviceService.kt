@@ -1,6 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
-import com.darcy.kotlin.server.demowebsocket.domain.table.Device
+import com.darcy.kotlin.server.demowebsocket.domain.table.device.Device
 import com.darcy.kotlin.server.demowebsocket.http.repository.DeviceRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

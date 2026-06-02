@@ -1,7 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
 import com.darcy.kotlin.server.demowebsocket.config.jwt.JwtTokenProvider
-import com.darcy.kotlin.server.demowebsocket.domain.table.User
+import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
