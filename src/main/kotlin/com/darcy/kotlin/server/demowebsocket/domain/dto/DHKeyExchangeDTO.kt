@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.domain.dto
 
 import com.darcy.kotlin.server.demowebsocket.domain.table.dh.DHKeyExchange
+import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil
 import java.time.LocalDateTime
 
 /**
@@ -15,10 +16,10 @@ data class DHKeyExchangeDTO(
     val algorithm: String = "",
     val isCompleted: Boolean = false,
     val isExpired: Boolean = false,
-    val expiresAt: LocalDateTime? = null,
-    val completedAt: LocalDateTime? = null,
-    val createdAt: LocalDateTime? = null,
-    val updatedAt: LocalDateTime? = null,
+    val expiresAt: String = "",
+    val completedAt: String = "",
+    val createdAt: String = "",
+    val updatedAt: String = "",
 )
 
 /**
@@ -34,10 +35,10 @@ fun DHKeyExchange.toDTO(): DHKeyExchangeDTO {
         algorithm = this.algorithm,
         isCompleted = this.isCompleted,
         isExpired = this.isExpired,
-        expiresAt = this.expiresAt,
-        completedAt = this.completedAt,
-        createdAt = this.createdAt,
-        updatedAt = this.updatedAt
+        expiresAt = TimeUtil.formatDateTimeToString(this.expiresAt),
+        completedAt = TimeUtil.formatDateTimeToString(this.completedAt),
+        createdAt = TimeUtil.formatDateTimeToString(this.createdAt),
+        updatedAt = TimeUtil.formatDateTimeToString(this.updatedAt)
     )
 }
 
