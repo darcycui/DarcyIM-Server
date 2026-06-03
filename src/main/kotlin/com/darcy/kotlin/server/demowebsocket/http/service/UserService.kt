@@ -46,6 +46,9 @@ class UserService @Autowired constructor(
         }
         return user.get()
     }
+    fun queryUserByUsername(username: String): User {
+        return userRepository.findByUsername(username) ?: throw UserException.USER_NOT_EXIST
+    }
 
     fun isUserExistByName(username: String): Boolean {
         return userRepository.existsByUsername(username)
