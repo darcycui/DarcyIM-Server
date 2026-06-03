@@ -6,6 +6,5 @@ import org.springframework.data.jpa.repository.Query
 
 interface DHKeyExchangeRepository : JpaRepository<DHKeyExchange, Long> {
 
-    @Query
-    fun findByUserIdAndPublicKey(userId:Long, publicKey:String)
+    fun findByUserId(userId:Long): DHKeyExchange?
 }

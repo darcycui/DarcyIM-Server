@@ -26,15 +26,14 @@ class TransportService @Autowired constructor(
             publicKey.hexStrToBytes().toPublicKey()
         ).bytesToHexStr()
         testSharedSecret = sharedSecret
-        return dhKeyExchangeRepository.save(
-            DHKeyExchange(
+        val item = dhKeyExchangeRepository.findByUserId(userId.toLong())
+            ?: DHKeyExchange(
                 user = user,
                 remotePublicKey = publicKey,
                 privateKey = ephemeralKeyPair.private.keyToString(),
                 publicKey = ephemeralKeyPair.public.keyToString(),
                 sharedSecret = sharedSecret, // todo 1.内存保存 2.使用 KMS
             )
-        )
+        return dhKeyExchangeRepository.save(item)
     }
-
 }

@@ -58,13 +58,7 @@ fun DHKeyExchangeDTO.toEntity(userId: Long): DHKeyExchange {
         privateKey = "", // 实际使用时需要设置真实的私钥
         keySize = this.keySize,
         algorithm = this.algorithm
-    ).apply {
-        this.id = this@toEntity.id
-        this.isCompleted = this@toEntity.isCompleted
-        this.isExpired = this@toEntity.isExpired
-        this.expiresAt = this@toEntity.expiresAt
-        this.completedAt = this@toEntity.completedAt
-    }
+    )
 }
 
 /**

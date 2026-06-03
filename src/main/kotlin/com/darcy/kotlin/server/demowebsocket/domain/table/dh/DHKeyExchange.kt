@@ -20,7 +20,7 @@ import java.time.LocalDateTime
         Index(name = "idx_expires_at", columnList = "expires_at")
     ],
     uniqueConstraints = [
-        UniqueConstraint(name = "uk_session_id", columnNames = ["session_id"])
+        UniqueConstraint(name = "uk_user_id", columnNames = ["user_id"])
     ]
 )
 @DynamicInsert
