@@ -2,7 +2,11 @@ package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.IConversationApi
 import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
+import com.darcy.kotlin.server.demowebsocket.domain.dto.conversation.ConversationDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.conversation.toDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.CommonRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ConversationCreateRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ConversationQueryRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.user.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.table.conversation.Conversation
 import com.darcy.kotlin.server.demowebsocket.exception.code600.ParamsException
@@ -16,44 +20,27 @@ class ConversationController @Autowired constructor(
     private val conversationService: ConversationService,
     private val userService: UserService,
 ) : IConversationApi {
-    override fun createConversation(params: Map<String, String>): String {
-        // http 参数校验
-        val userId = params["userId"]?.toLongOrNull() ?: throw ParamsException.ParamsNotValid(
-            mapOf("userId" to "用户ID不能为空")
-        )
-        val targetId = params["targetId"]?.toLongOrNull() ?: throw ParamsException.ParamsNotValid(
-            mapOf("targetId" to "目标用户ID不能为空")
-        )
-        val conversationType = params["conversationType"]?.toIntOrNull()?.let {
-            Conversation.ConversationType.fromCode(it)
-        } ?: throw ParamsException.ParamsNotValid(
-            mapOf("conversationType" to "会话类型不能为空")
-        )
+    override fun createConversation(params: ConversationCreateRequestDTO): ConversationDTO {
         // 调用 Service 完成业务逻辑
-        val result = conversationService.createConversation(userId, conversationType, targetId)
-        val targetUser = userService.queryUserById(targetId).toDTO()
-        // 返回 json结果
-        return ResultEntity.success(result.toDTO(targetUser)).toJsonString()
+        val conversationType = Conversation.ConversationType.fromCode(params.conversationType)
+        val result = conversationService.createConversation(
+            params.userId, params.targetId, conversationType
+        )
+        val targetUser = userService.queryUserById(params.targetId).toDTO()
+        // 返回 Object 结果
+        return result.toDTO(targetUser)
     }
 
-    override fun queryConversations(params: Map<String, String>): String {
-        val userId = params["userId"]?.toLongOrNull() ?: 0L
-        if (userId == 0L) {
-            throw ParamsException.ParamsNotValid(mapOf("userId" to "用户ID不能为空"))
-        }
-        val result = conversationService.queryConversations(userId)
+    override fun queryConversations(params: CommonRequestDTO): List<ConversationDTO> {
+        val result = conversationService.queryConversations(params.userId)
         val targetList = result.map { item -> userService.queryUserById(item.targetId) }
-        return ResultEntity.success(result.toDTO(targetList)).toJsonString()
+        return result.toDTO(targetList)
     }
 
-    override fun queryConversationById(params: Map<String, String>): String {
-        val conversationId = params["conversationId"]?.toLongOrNull() ?: 0L
-        if (conversationId == 0L) {
-            throw ParamsException.ParamsNotValid(mapOf("conversationId" to "会话ID不能为空"))
-        }
-        val result = conversationService.queryOneConversation(conversationId)
+    override fun queryConversationById(params: ConversationQueryRequestDTO): ConversationDTO {
+        val result = conversationService.queryOneConversation(params.conversationId)
         val targetUser = userService.queryUserById(result.targetId).toDTO()
-        return ResultEntity.success(result.toDTO(targetUser)).toJsonString()
+        return result.toDTO(targetUser)
     }
 
 }

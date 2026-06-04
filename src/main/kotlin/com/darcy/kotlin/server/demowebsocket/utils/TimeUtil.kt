@@ -41,6 +41,10 @@ object TimeUtil {
         return formatDateTimeToString(now)
     }
 
+    fun getCurrentTimeDate(): LocalDateTime {
+        return LocalDateTime.now()
+    }
+
     fun defaultDateTime(): LocalDateTime {
         return LocalDateTime.of(1970, 1, 1, 0, 0, 0)
     }

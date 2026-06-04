@@ -1,26 +1,31 @@
 package com.darcy.kotlin.server.demowebsocket.api
 
+import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.FriendRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.FriendRequestActionRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.FriendRequestCreateRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.FriendRequestQueryFromRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.FriendRequestQueryToRequestDTO
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 
 @RequestMapping("/api/friend-requests")
 interface IFriendRequestApi {
     @PostMapping("/create")
-    fun createFriendRequest(@RequestParam params: Map<String, String>): String
+    fun createFriendRequest(@RequestBody params: FriendRequestCreateRequestDTO): FriendRequestDTO
 
     @PostMapping("/accept")
-    fun acceptFriendRequest(@RequestParam params: Map<String, String>): String
+    fun acceptFriendRequest(@RequestBody params: FriendRequestActionRequestDTO): FriendRequestDTO
 
     @PostMapping("/reject")
-    fun rejectFriendRequest(@RequestParam params: Map<String, String>): String
+    fun rejectFriendRequest(@RequestBody params: FriendRequestActionRequestDTO): FriendRequestDTO
 
     @PostMapping("/ignore")
-    fun ignoreFriendRequest(@RequestParam params: Map<String, String>): String
+    fun ignoreFriendRequest(@RequestBody params: FriendRequestActionRequestDTO): FriendRequestDTO
 
     @PostMapping("/query/from")
-    fun queryFriendRequestByFromUser(@RequestParam params: Map<String, String>): String
+    fun queryFriendRequestByFromUser(@RequestBody params: FriendRequestQueryFromRequestDTO): List<FriendRequestDTO>
 
     @PostMapping("/query/to")
-    fun queryFriendRequestByToUser(@RequestParam params: Map<String, String>): String
+    fun queryFriendRequestByToUser(@RequestBody params: FriendRequestQueryToRequestDTO): List<FriendRequestDTO>
 }

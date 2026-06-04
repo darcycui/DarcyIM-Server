@@ -1,6 +1,8 @@
 package com.darcy.kotlin.server.demowebsocket
 
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.LoginRequestDTO
 import com.darcy.kotlin.server.demowebsocket.utils.HashUtil
+import com.darcy.kotlin.server.demowebsocket.utils.JsonUtil
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -24,30 +26,19 @@ class LoginTests {
     private lateinit var mockMvc: MockMvc
 
     @Test
-    fun `test-login`(){
+    fun `test-login-v2`() {
+        val loginRequest = LoginRequestDTO(
+            phone = "156000111222",
+            password = HashUtil.sha256Str("123456")
+//            phone = "",
+//            password = ""
+        )
         val result = mockMvc.perform(
             post("http://localhost:$port/api/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("name", "Snow White") // id:20 及以后的用户密码需要hash后传递
-                .param("phone", "152000111222")
-                .param("password", HashUtil.sha256Str("123456"))
-//                .param("password", "123456")
-        ).andExpect(status().isOk)
-            .andReturn()
-            .response
-            .contentAsString
-        println("result-->$result")
-    }
-
-    @Test
-    fun `test-login-jerry`(){
-        val result = mockMvc.perform(
-            post("http://localhost:$port/api/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("name", "Jerry")
-                .param("phone", "138000111222")
-                .param("password", "123456")
-        ).andExpect(status().isOk)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.toJson(loginRequest))
+        )
+            .andExpect(status().isOk)
             .andReturn()
             .response
             .contentAsString

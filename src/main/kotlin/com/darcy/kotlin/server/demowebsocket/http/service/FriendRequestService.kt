@@ -18,7 +18,7 @@ class FriendRequestService @Autowired constructor(
 ) {
 
     @Transactional
-    fun createFriendRequest(fromUserId: Long, toUserId: Long, params: Map<String, Any>): FriendRequest {
+    fun createFriendRequest(fromUserId: Long, toUserId: Long): FriendRequest {
         val fromUser = userService.queryUserById(fromUserId)
         val toUser = userService.queryUserById(toUserId)
         if (friendshipService.isFriend(fromUserId, toUserId)) {

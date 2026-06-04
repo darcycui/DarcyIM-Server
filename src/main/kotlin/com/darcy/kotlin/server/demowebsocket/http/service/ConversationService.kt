@@ -18,8 +18,8 @@ class ConversationService @Autowired constructor(
 ) {
     fun createConversation(
         userId: Long,
+        targetId: Long,
         conversationType: Conversation.ConversationType,
-        targetId: Long
     ): Conversation {
         // 业务参数校验
         val user = userService.queryUserById(userId)

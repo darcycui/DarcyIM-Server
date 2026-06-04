@@ -81,11 +81,15 @@ dependencies {
     // 添加 Flyway 用于数据库升级
     implementation("org.flywaydb:flyway-core:10.22.0")
     implementation("org.flywaydb:flyway-mysql:10.22.0")
+    // 添加 Springboot Validation 依赖
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
 
 }
 
 kotlin {
     compilerOptions {
+        javaParameters = true // 保留方法参数名
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
 }
