@@ -1,7 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.message.read
 
 import com.alibaba.fastjson2.JSON
-import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverMessageReadStatusMarkInputDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverMessageReadStatusMarkRequestDTO
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,7 +26,7 @@ class MessageReadStatusTests {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    private val receiverMessageReadStatusMarkInputDTO = ReceiverMessageReadStatusMarkInputDTO(
+    private val receiverMessageReadStatusMarkInputDTO = ReceiverMessageReadStatusMarkRequestDTO(
         userId = 4,
         fromUserName = "电脑",
         targetId = 5,

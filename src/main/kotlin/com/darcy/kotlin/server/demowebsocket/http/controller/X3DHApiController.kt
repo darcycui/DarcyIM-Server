@@ -2,6 +2,13 @@ package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.x3dh.IX3DHApi
 import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.X3DHPullHelloRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.X3DHPullKeysRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.X3DHPushHelloRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.X3DHPushKeysRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.HelloMessageDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.X3DHPullKeysDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.X3DHPushKeysDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.toDTO
 import com.darcy.kotlin.server.demowebsocket.exception.code600.ParamsException
 import com.darcy.kotlin.server.demowebsocket.http.service.X3DHService
@@ -12,58 +19,38 @@ import org.springframework.web.bind.annotation.RestController
 class X3DHApiController @Autowired constructor(
     private val x3dhService: X3DHService,
 ) : IX3DHApi {
-    override fun pushKeys(params: Map<String, String>): String {
+    override fun pushKeys(params: X3DHPushKeysRequestDTO): X3DHPushKeysDTO {
         val userId =
-            params["userId"]?.toLong() ?: throw ParamsException.ParamsNotValid(mapOf("userId" to "用户ID不能为空"))
+            params.userId
         val result = x3dhService.createUserKeys(
             userId,
-            params["identityKey"] ?: throw ParamsException.ParamsNotValid(mapOf("identityKey" to "用户公钥不能为空")),
-            params["signedPreKey"]
-                ?: throw ParamsException.ParamsNotValid(mapOf("signedPreKey" to "已签名的预密钥不能为空")),
-            params["oneTimePreKeys"]
-                ?: throw ParamsException.ParamsNotValid(mapOf("oneTimePreKeys" to "一次性预密钥不能为空"))
+            params.identityKey,
+            params.signedPreKey,
+            params.oneTimePreKeys
         )
-        return ResultEntity.success(result).toJsonString()
+        return result
     }
 
-    override fun pullKeys(params: Map<String, String>): String {
-        val aliceUserId = params["aliceUserId"]?.toLong()
-            ?: throw ParamsException.ParamsNotValid(mapOf("aliceUserId" to "用户ID不能为空"))
-        val bobUserId = params["bobUserId"]?.toLong()
-            ?: throw ParamsException.ParamsNotValid(mapOf("bobUserId" to "用户ID不能为空"))
-        val result = x3dhService.queryUserKeys(aliceUserId, bobUserId)
-        return ResultEntity.success(result).toJsonString()
+    override fun pullKeys(params: X3DHPullKeysRequestDTO): X3DHPullKeysDTO {
+        val result = x3dhService.queryUserKeys(params.aliceUserId, params.bobUserId)
+        return result
     }
 
-    override fun pushHelloMessage(params: Map<String, String>): String {
-        val aliceUserId = params["aliceUserId"]?.toLong()
-            ?: throw ParamsException.ParamsNotValid(mapOf("aliceUserId" to "用户ID不能为空"))
-        val bobUserId = params["bobUserId"]?.toLong()
-            ?: throw ParamsException.ParamsNotValid(mapOf("bobUserId" to "用户ID不能为空"))
-        val aliceIdentityKey = params["aliceIdentityKey"]
-            ?: throw ParamsException.ParamsNotValid(mapOf("aliceIdentityKey" to "用户身份公钥不能为空"))
-        val aliceEphemeralKey = params["aliceEphemeralKey"]
-            ?: throw ParamsException.ParamsNotValid(mapOf("aliceEphemeralKey" to "用户临时公钥不能为空"))
-        val bobOneTimePreKeyId = params["bobOneTimePreKeyId"] ?: throw ParamsException.ParamsNotValid(
-            mapOf("bobOneTimePreKeyIndex" to "用户一次性预密钥索引不能为空")
-        )
+    override fun pushAliceHelloMessage(params: X3DHPushHelloRequestDTO): HelloMessageDTO {
         val result = x3dhService.createHelloMessage(
-            aliceUserId,
-            bobUserId,
-            aliceIdentityKey,
-            aliceEphemeralKey,
-            bobOneTimePreKeyId
+            params.aliceUserId,
+            params.bobUserId,
+            params.aliceIdentityKey,
+            params.aliceEphemeralKey,
+            params.bobOneTimePreKeyId
         )
-        return ResultEntity.success(result.toDTO()).toJsonString()
+        return result.toDTO()
     }
 
-    override fun pullAliceHello(params: Map<String, String>): String {
-        val aliceUserId = params["aliceUserId"]?.toLong()
-            ?: throw ParamsException.ParamsNotValid(mapOf("aliceUserId" to "用户ID不能为空"))
-        val bobUserId = params["bobUserId"]?.toLong() ?: throw ParamsException.ParamsNotValid(
-            mapOf("bobUserId" to "用户ID不能为空")
+    override fun pullAliceHello(params: X3DHPullHelloRequestDTO): HelloMessageDTO {
+        val result = x3dhService.queryHelloMessage(
+            params.aliceUserId, params.bobUserId
         )
-        val result = x3dhService.queryHelloMessage(aliceUserId, bobUserId).toDTO()
-        return ResultEntity.success(result).toJsonString()
+        return result.toDTO()
     }
 }

@@ -1,5 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.UserUpdateRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.repository.UserRepository
@@ -14,8 +15,8 @@ import kotlin.jvm.optionals.getOrNull
 
 @Service
 class UserService @Autowired constructor(
-   private val userRepository: UserRepository,
-   private val passwordUtil: PasswordUtil
+    private val userRepository: UserRepository,
+    private val passwordUtil: PasswordUtil
 ) {
 
     @Transactional
@@ -46,6 +47,7 @@ class UserService @Autowired constructor(
         }
         return user.get()
     }
+
     fun queryUserByUsername(username: String): User {
         return userRepository.findByUsername(username) ?: throw UserException.USER_NOT_EXIST
     }
@@ -67,12 +69,24 @@ class UserService @Autowired constructor(
     }
 
     @Transactional
-    fun updateUser(user: User): User {
-        return userRepository.save(user)
+    fun updateUser(userId: Long, userUpdateRequestDTO: UserUpdateRequestDTO): User {
+        val user = queryUserById(userId)
+        val newUser = user.apply {
+            username = userUpdateRequestDTO.username
+        }
+        return userRepository.save(newUser)
     }
 
-    fun deleteUser(user: User) {
-        userRepository.delete(user)
+    fun deleteUser(userId: Long): String {
+        return kotlin.runCatching {
+            userRepository.deleteById(userId)
+            "删除用户成功"
+        }.onSuccess {
+            DarcyLogger.info("删除用户成功: userId=$userId")
+        }.onFailure {
+            DarcyLogger.error("删除用户失败: userId=$userId")
+            it.printStackTrace()
+        }.getOrElse { "删除用户失败" }
     }
 
     fun queryAllUsers(): List<User> {

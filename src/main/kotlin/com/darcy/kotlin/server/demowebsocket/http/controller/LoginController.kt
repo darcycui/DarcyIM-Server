@@ -17,7 +17,7 @@ class LoginController @Autowired constructor(
     val loginService: LoginService
 ) : ILoginApi {
 
-    override fun loginV2(@RequestBody @Valid params: LoginRequestDTO): UserDTO {
+    override fun loginV2(params: LoginRequestDTO): UserDTO {
         val existUser = loginService.getValidateUser(params.phone, params.password)
         return existUser.toDTO()
     }

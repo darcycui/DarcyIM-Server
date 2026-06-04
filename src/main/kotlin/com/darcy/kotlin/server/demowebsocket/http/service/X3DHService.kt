@@ -2,8 +2,8 @@ package com.darcy.kotlin.server.demowebsocket.http.service
 
 import com.alibaba.fastjson2.JSON
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.OneTimePreKeyInputDTO
-import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.X3DHKeysPullDTO
-import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.X3DHKeysPushDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.X3DHPullKeysDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.x3dh.X3DHPushKeysDTO
 import com.darcy.kotlin.server.demowebsocket.domain.table.x3dh.HelloMessage
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.exception.code1000.X3DHException
@@ -32,27 +32,23 @@ class X3DHService @Autowired constructor(
         userId: Long,
         identityKeyStr: String,
         signedPreKeyStr: String,
-        oneTimePreKeysStr: String
-    ): X3DHKeysPushDTO {
+        oneTimePreKeyList: List<OneTimePreKeyInputDTO>
+    ): X3DHPushKeysDTO {
         if (userService.isUserExistById(userId).not()) {
             throw UserException.USER_NOT_EXIST
         }
         val identityKey = identityKeyService.createIdentityKey(userId, identityKeyStr)
         val signedPreKey = signedPreKeyService.createSignedPreKey(userId, signedPreKeyStr)
-        val oneTimePreKeyList = try {
-            JSON.parseArray(oneTimePreKeysStr,  OneTimePreKeyInputDTO::class.java)
-        } catch (e: Exception) {
-            DarcyLogger.error("解析 oneTimePreKeys 失败: ${e.message}", e)
-            emptyList()
-        }
         val oneTimePreKeys = oneTimePreKeyService.createOneTimePreKeys(userId, oneTimePreKeyList)
-        val status =
-            if (identityKey.publicKey.isNotEmpty() && signedPreKey.publicKey.isNotEmpty() && oneTimePreKeys.isNotEmpty()) {
-                1
-            } else {
-                0
-            }
-        return X3DHKeysPushDTO(
+        val status = if (identityKey.publicKey.isNotEmpty()
+            && signedPreKey.publicKey.isNotEmpty()
+            && oneTimePreKeys.isNotEmpty()
+        ) {
+            1
+        } else {
+            0
+        }
+        return X3DHPushKeysDTO(
             userId = userId,
             status = status,
             message = "success",
@@ -60,14 +56,14 @@ class X3DHService @Autowired constructor(
     }
 
 
-    fun queryUserKeys(aliceUserId: Long, bobUserId: Long): X3DHKeysPullDTO {
+    fun queryUserKeys(aliceUserId: Long, bobUserId: Long): X3DHPullKeysDTO {
         if (userService.isUserExistById(aliceUserId).not() || userService.isUserExistById(bobUserId).not()) {
             throw UserException.USER_NOT_EXIST
         }
         val identityKey = identityKeyService.queryByUserId(bobUserId)
         val signedPreKey = signedPreKeyService.queryByUserId(bobUserId)
         val oneTimePreKey = oneTimePreKeyService.queryFirstEnabled(bobUserId)
-        return X3DHKeysPullDTO(
+        return X3DHPullKeysDTO(
             identityKey.publicKey,
             signedPreKey.publicKey,
             oneTimePreKey.publicKey,

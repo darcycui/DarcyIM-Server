@@ -27,13 +27,12 @@ class GroupService @Autowired constructor(
     private val idGenerator: UUIdGenerator,
 ) {
     @Transactional
-    fun createGroup(params: Map<String, String>): Group {
-        val ownerId = params["ownerId"]?.toLongOrNull() ?: throw UserException.USER_NOT_EXIST
+    fun createGroup(ownerId: Long, groupName: String): Group {
         val owner = userService.queryUserById(ownerId)
         val group = Group(
             // 群ID 唯一
             groupId = idGenerator.nextGroupId(),
-            groupName = params["groupName"] as String,
+            groupName = groupName,
             owner = owner,
             maxMembers = 20,
             currentMembers = 1,
@@ -51,15 +50,13 @@ class GroupService @Autowired constructor(
         )
         groupMemberService.addGroupMember(member)
         // 创建群聊会话
-        conversationService.createConversation(ownerId, Conversation.ConversationType.GROUP, groupResult.id)
+        conversationService.createConversation(ownerId, groupResult.id, Conversation.ConversationType.GROUP)
         return groupResult
     }
 
     @Transactional
-    fun updateGroup(params: Map<String, String>): Group {
-        val id = params["groupId"]?.toLongOrNull() ?: throw GroupException.GROUP_NOT_EXIST
-        val groupName = params["groupName"] as String
-        val group = groupRepository.findById(id).orElse(null) ?: throw GroupException.GROUP_NOT_EXIST
+    fun updateGroup(groupId: Long, groupName: String): Group {
+        val group = groupRepository.findById(groupId).orElse(null) ?: throw GroupException.GROUP_NOT_EXIST
         if (groupName == group.groupName) {
             throw GroupException.GROUP_INFO_NOT_CHANGED
         }
@@ -106,7 +103,7 @@ class GroupService @Autowired constructor(
         // 添加被邀请人到群成员
         val result = groupMemberService.addGroupMember(member)
         // 创建群聊会话
-        conversationService.createConversation(inviteeId, Conversation.ConversationType.GROUP, groupId)
+        conversationService.createConversation(inviteeId, groupId, Conversation.ConversationType.GROUP)
         return result
     }
 

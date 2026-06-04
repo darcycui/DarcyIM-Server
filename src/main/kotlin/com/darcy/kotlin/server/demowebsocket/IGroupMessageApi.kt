@@ -1,5 +1,9 @@
 package com.darcy.kotlin.server.demowebsocket
 
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupMessageQueryRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.MessageSendRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
+import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -7,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam
 @RequestMapping("/api/group-messages")
 interface IGroupMessageApi {
     @PostMapping("/send")
-    fun sendMessage(@RequestParam params: Map<String, String>): String
+    fun sendMessage(@RequestParam params: MessageSendRequestDTO): GroupMessageDTO
 
     @PostMapping("/query/page")
-    fun queryGroupMessages(@RequestParam params: Map<String, String>): String
+    fun queryGroupMessages(@RequestParam params: GroupMessageQueryRequestDTO): Page<GroupMessageDTO>
 }

@@ -1,6 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.controller
 
-import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverMessageReadStatusMarkInputDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverMessageReadStatusMarkRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.toDTO
@@ -48,7 +48,7 @@ class StompController @Autowired constructor(
         stompService.sendTargetGroup(groupMessage)
     }
 
-    override fun markMessageRead(sha: SimpMessageHeaderAccessor, receiverMessageReadStatusMarkInputDTO: ReceiverMessageReadStatusMarkInputDTO) {
+    override fun markMessageRead(sha: SimpMessageHeaderAccessor, receiverMessageReadStatusMarkInputDTO: ReceiverMessageReadStatusMarkRequestDTO) {
         val userId = receiverMessageReadStatusMarkInputDTO.userId
         val msgIds = receiverMessageReadStatusMarkInputDTO.msgIds
         val updatedCount = messageReadStatusService.receiverMarkMessagesAsRead(userId, msgIds)

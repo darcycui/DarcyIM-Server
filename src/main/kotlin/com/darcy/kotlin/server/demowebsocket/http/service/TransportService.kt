@@ -18,15 +18,15 @@ class TransportService @Autowired constructor(
     private val dhKeyExchangeRepository: DHKeyExchangeRepository,
     private val userService: UserService,
 ) {
-    fun dhKeyExchange(userId: String, publicKey: String): DHKeyExchange {
-        val user = userService.queryUserById(userId.toLong())
+    fun dhKeyExchange(userId: Long, publicKey: String): DHKeyExchange {
+        val user = userService.queryUserById(userId)
         val ephemeralKeyPair: KeyPair = ECCExchangeHelper.generateKeyPair()
         val sharedSecret = ECCExchangeHelper.getSharedSecret(
             ephemeralKeyPair.private,
             publicKey.hexStrToBytes().toPublicKey()
         ).bytesToHexStr()
         testSharedSecret = sharedSecret
-        val item = dhKeyExchangeRepository.findByUserId(userId.toLong())
+        val item = dhKeyExchangeRepository.findByUserId(userId)
             ?: DHKeyExchange(
                 user = user,
                 remotePublicKey = publicKey,

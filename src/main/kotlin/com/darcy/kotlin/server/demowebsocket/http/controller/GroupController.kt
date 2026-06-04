@@ -1,9 +1,14 @@
 package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.IGroupApi
-import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
-import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.toDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.group.GroupDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.group.GroupMemberDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.group.toDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupCreateRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupInviteRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupQueryRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupUpdateRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.string.StringDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.string.toDTO
 import com.darcy.kotlin.server.demowebsocket.exception.code600.ParamsException
 import com.darcy.kotlin.server.demowebsocket.http.service.GroupMemberService
@@ -16,47 +21,35 @@ class GroupController @Autowired constructor(
     private val groupService: GroupService,
     private val groupMemberService: GroupMemberService,
 ) : IGroupApi {
-    override fun createGroup(params: Map<String, String>): String {
-        params["ownerId"]?.toLongOrNull()
-            ?: throw ParamsException.ParamsNotValid(mapOf("ownerId" to "创建者ID不能为空"))
-        params["groupName"] ?: throw ParamsException.ParamsNotValid(mapOf("groupName" to "群组ID不能为空"))
-        val result = groupService.createGroup(params)
-        return ResultEntity.success(result.toDTO()).toJsonString()
+    override fun createGroup(params: GroupCreateRequestDTO): GroupDTO {
+        val result = groupService.createGroup(params.ownerId, params.groupName)
+        return result.toDTO()
     }
 
-    override fun updateGroup(params: Map<String, String>): String {
-        params["groupId"] ?: throw ParamsException.ParamsNotValid(mapOf("groupId" to "群组ID不能为空"))
-        params["groupName"] ?: throw ParamsException.ParamsNotValid(mapOf("groupName" to "新群组名称不能为空"))
-        val result = groupService.updateGroup(params)
-        return ResultEntity.success(result.toDTO()).toJsonString()
+    override fun updateGroup(params: GroupUpdateRequestDTO): GroupDTO {
+        val result = groupService.updateGroup(params.groupId, params.groupName)
+        return result.toDTO()
     }
 
-    override fun deleteGroup(params: Map<String, String>): String {
-        val groupId = params["groupId"]?.toLongOrNull() ?: throw ParamsException.ParamsNotValid(mapOf("groupId" to "群组ID不能为空"))
-        val result = groupService.deleteGroup(groupId)
-        return ResultEntity.success(result.toDTO()).toJsonString()
+    override fun deleteGroup(params: GroupQueryRequestDTO): StringDTO {
+        val result = groupService.deleteGroup(params.groupId)
+        return result.toDTO()
     }
 
-    override fun queryGroupById(params: Map<String, String>): String {
-        val groupId = params["groupId"]?.toLongOrNull() ?: throw ParamsException.ParamsNotValid(mapOf("groupId" to "群组ID不能为空"))
-        val result = groupService.queryGroupById(groupId)
-        return ResultEntity.success(result.toDTO()).toJsonString()
+    override fun queryGroupById(params: GroupQueryRequestDTO): GroupDTO {
+        val result = groupService.queryGroupById(params.groupId)
+        return result.toDTO()
     }
 
-    override fun inviteToGroup(params: Map<String, String>): String {
-        val inviterId = params["inviterId"]?.toLongOrNull()
-            ?: throw ParamsException.ParamsNotValid(mapOf("inviterId" to "邀请人ID不能为空"))
-        val inviteeId = params["inviteeId"]?.toLongOrNull()
-            ?: throw ParamsException.ParamsNotValid(mapOf("inviteeId" to "被邀请人ID不能为空"))
-        val groupId = params["groupId"]?.toLongOrNull() ?: throw ParamsException.ParamsNotValid(mapOf("groupId" to "群组ID不能为空"))
-        val result = groupService.inviteToGroup(inviterId, inviteeId, groupId)
-        return ResultEntity.success(result.toDTO()).toJsonString()
+    override fun inviteToGroup(params: GroupInviteRequestDTO): GroupMemberDTO {
+        val result = groupService.inviteToGroup(
+            params.inviterId, params.inviteeId, params.groupId
+        )
+        return result.toDTO()
     }
 
-    override fun queryGroupMembers(params: Map<String, String>): String {
-        val id = params["groupId"]?.toLongOrNull()
-            ?: throw ParamsException.ParamsNotValid(mapOf("groupId" to "群组ID不能为空"))
-        val result = groupMemberService.queryGroupMembers(id)
-        return ResultEntity.success(result.toDTO()).toJsonString()
+    override fun queryGroupMembers(params: GroupQueryRequestDTO): List<GroupMemberDTO> {
+        val result = groupMemberService.queryGroupMembers(params.groupId)
+        return result.toDTO()
     }
 }

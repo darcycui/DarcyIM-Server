@@ -1,14 +1,24 @@
 package com.darcy.kotlin.server.demowebsocket.domain.dto.input
 
+import jakarta.validation.constraints.NotBlank
+
 
 /**
  * 接收方离线消息同步请求
  */
-data class ReceiverOfflineMessageSyncInputDTO(
+data class ReceiverOfflineMessageSyncRequestDTO(
+    @field:NotBlank(message = "用户ID不能为空")
     val userId: Long = 0L,                    // 接收方用户ID
+
+    @field:NotBlank(message = "目标ID不能为空")
     val targetId: Long = 0L,                  // 发送方用户ID（会话目标）
+
+    @field:NotBlank(message = "会话ID不能为空")
     val conversationId: Long = 1,             // 会话ID
+
+    @field:NotBlank(message = "会话类型不能为空")
     val conversationType: Int = 1,            // 会话类型：1-私聊，2-群聊
+
     val lastMsgId: String? = null,            // 客户端最后一条消息ID（游标）
     val lastSyncTime: String? = null,         // 客户端最后同步时间（备选游标）
     val page: Int? = null,                    // 页码（从0开始）

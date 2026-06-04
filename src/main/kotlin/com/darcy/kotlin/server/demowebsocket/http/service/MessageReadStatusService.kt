@@ -1,7 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
-import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverOfflineMessageSyncInputDTO
-import com.darcy.kotlin.server.demowebsocket.domain.dto.message.*
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverOfflineMessageSyncRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.table.conversation.Conversation
 import com.darcy.kotlin.server.demowebsocket.domain.table.message.MessageReadStatus
 import com.darcy.kotlin.server.demowebsocket.domain.table.message.PrivateMessage
@@ -70,16 +69,16 @@ class MessageReadStatusService @Autowired constructor(
     fun senderSyncOfflineMessageReadStatus(
         userId: Long,
         targetId: Long,
-        since: String?,
-        until: String?
+        since: String,
+        until: String
     ): List<MessageReadStatus> {
         // 如果客户端没有提供 since，则从用户表中获取 lastActiveTime
-        val actualSince = since ?: run {
+        val actualSince = since.ifEmpty {
             val user = userService.queryUserById(userId)
             TimeUtil.formatDateTimeToString(user.lastActiveTime)
         }
         val sinceTime = TimeUtil.parseStringToDateTime(actualSince)
-        val untilTime = until?.let { TimeUtil.parseStringToDateTime(it) } ?: LocalDateTime.now()
+        val untilTime = if (until.isNotEmpty()) TimeUtil.parseStringToDateTime(until) else LocalDateTime.now()
         return messageReadStatusRepository.senderFindReadMessageListByConversationWithTimeRange(
             userId, targetId, sinceTime, untilTime
         )
@@ -91,7 +90,7 @@ class MessageReadStatusService @Autowired constructor(
      * 只要消息未读 可以一直查询到
      */
     @Transactional(readOnly = true)
-    fun receiverPullOfflineMessagesByReadStatus(input: ReceiverOfflineMessageSyncInputDTO): Page<PrivateMessage> {
+    fun receiverPullOfflineMessagesByReadStatus(input: ReceiverOfflineMessageSyncRequestDTO): Page<PrivateMessage> {
         val userId = input.userId
         val targetId = input.targetId
         val page = (input.page ?: 1) - 1  // 客户端页码从1开始 服务端Page默认从0开始 这里需要转换索引
@@ -111,7 +110,7 @@ class MessageReadStatusService @Autowired constructor(
      * 只查询指定时间之后的消息 默认从上次离线时间开始
      */
     @Transactional(readOnly = true)
-    fun receiverPullOfflineMessagesByTimestamp(input: ReceiverOfflineMessageSyncInputDTO): Page<PrivateMessage> {
+    fun receiverPullOfflineMessagesByTimestamp(input: ReceiverOfflineMessageSyncRequestDTO): Page<PrivateMessage> {
         val userId = input.userId
         val targetId = input.targetId
         val page = (input.page ?: 1) - 1  // 客户端页码从1开始 服务端Page默认从0开始 这里需要转换索引
@@ -125,8 +124,8 @@ class MessageReadStatusService @Autowired constructor(
             userService.queryLastActiveTime(userId)
         } ?: TimeUtil.defaultDateTime()
         val messagesPage = privateMessageService.queryMessagesSinceTimestamp(
-                userId, targetId, sinceTime, pageable
-            )
+            userId, targetId, sinceTime, pageable
+        )
         DarcyLogger.info("离线同步完成: totalElements=${messagesPage.totalElements}, totalPages=${messagesPage.totalPages}, currentPage=${messagesPage.content.size}")
         return messagesPage
     }
