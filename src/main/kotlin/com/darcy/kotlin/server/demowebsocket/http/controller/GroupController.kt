@@ -5,12 +5,11 @@ import com.darcy.kotlin.server.demowebsocket.domain.dto.group.GroupDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.group.GroupMemberDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.group.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupCreateRequestDTO
-import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupInviteRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupInviteCreateRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupQueryRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupUpdateRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.string.StringDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.string.toDTO
-import com.darcy.kotlin.server.demowebsocket.exception.code600.ParamsException
 import com.darcy.kotlin.server.demowebsocket.http.service.GroupMemberService
 import com.darcy.kotlin.server.demowebsocket.http.service.GroupService
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,7 +40,7 @@ class GroupController @Autowired constructor(
         return result.toDTO()
     }
 
-    override fun inviteToGroup(params: GroupInviteRequestDTO): GroupMemberDTO {
+    override fun inviteToGroup(params: GroupInviteCreateRequestDTO): GroupMemberDTO {
         val result = groupService.inviteToGroup(
             params.inviterId, params.inviteeId, params.groupId
         )

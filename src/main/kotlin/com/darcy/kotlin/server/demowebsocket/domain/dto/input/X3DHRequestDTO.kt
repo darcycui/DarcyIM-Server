@@ -14,7 +14,7 @@ data class X3DHPushKeysRequestDTO(
 
     @field:NotBlank(message = "一次性预密钥不能为空")
     val oneTimePreKeys: List<OneTimePreKeyInputDTO> = listOf()
-)
+) : IRequestDTO
 
 data class X3DHPullKeysRequestDTO(
     @field:NotBlank(message = "Alice用户ID不能为空")
@@ -22,7 +22,7 @@ data class X3DHPullKeysRequestDTO(
 
     @field:NotBlank(message = "Bob用户ID不能为空")
     var bobUserId: Long = 0
-)
+) : IRequestDTO
 
 data class X3DHPushHelloRequestDTO(
     @field:NotBlank(message = "Alice用户ID不能为空")
@@ -39,7 +39,7 @@ data class X3DHPushHelloRequestDTO(
 
     @field:NotBlank(message = "Bob的预密钥索引不能为空")
     val bobOneTimePreKeyId: String = ""
-)
+) : IRequestDTO
 
 
 data class X3DHPullHelloRequestDTO(
@@ -48,4 +48,12 @@ data class X3DHPullHelloRequestDTO(
 
     @field:NotBlank(message = "Bob用户ID不能为空")
     var bobUserId: Long = 0,
-)
+) : IRequestDTO
+
+data class OneTimePreKeyInputDTO(
+    var id: Long = 0,
+    var keyId: String = "",
+    var userId: Long = 0,
+    var publicKey: String = "",
+) : IRequestDTO {
+}

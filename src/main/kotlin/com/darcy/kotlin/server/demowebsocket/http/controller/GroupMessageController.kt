@@ -2,7 +2,7 @@ package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.IGroupMessageApi
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupMessageQueryRequestDTO
-import com.darcy.kotlin.server.demowebsocket.domain.dto.input.MessageSendRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupMessageSendRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.toDTO
 import com.darcy.kotlin.server.demowebsocket.exception.code600.ParamsException
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 class GroupMessageController @Autowired constructor(
     private val groupMessageService: GroupMessageService
 ) : IGroupMessageApi {
-    override fun sendMessage(params: MessageSendRequestDTO): GroupMessageDTO {
+    override fun sendMessage(params: GroupMessageSendRequestDTO): GroupMessageDTO {
         val result = groupMessageService.createMessage(
             params.senderId, params.receiverId, params.conversationId, params.content, params.msgId
         )

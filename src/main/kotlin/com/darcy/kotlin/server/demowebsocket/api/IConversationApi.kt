@@ -4,18 +4,19 @@ import com.darcy.kotlin.server.demowebsocket.domain.dto.conversation.Conversatio
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.CommonRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ConversationCreateRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ConversationQueryRequestDTO
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestBody
 
 @RequestMapping("/api/conversations")
 interface IConversationApi {
     @PostMapping("/create")
-    fun createConversation(@RequestParam params: ConversationCreateRequestDTO): ConversationDTO
+    fun createConversation(@RequestBody @Valid params: ConversationCreateRequestDTO): ConversationDTO
 
     @PostMapping("/query/all")
-    fun queryConversations(@RequestParam params: CommonRequestDTO): List<ConversationDTO>
+    fun queryConversations(@RequestBody @Valid params: CommonRequestDTO): List<ConversationDTO>
 
     @PostMapping("/query/id")
-    fun queryConversationById(@RequestParam params: ConversationQueryRequestDTO): ConversationDTO
+    fun queryConversationById(@RequestBody @Valid params: ConversationQueryRequestDTO): ConversationDTO
 }

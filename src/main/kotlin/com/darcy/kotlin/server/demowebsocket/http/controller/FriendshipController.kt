@@ -4,7 +4,7 @@ import com.darcy.kotlin.server.demowebsocket.api.IFriendshipApi
 import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.FriendshipDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.CommonRequestDTO
-import com.darcy.kotlin.server.demowebsocket.domain.dto.input.DeleteFriendRequestDTO
+import com.darcy.kotlin.server.demowebsocket.domain.dto.input.FriendshipDeleteRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.string.StringDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.string.toDTO
 import com.darcy.kotlin.server.demowebsocket.http.service.FriendshipService
@@ -20,7 +20,7 @@ class FriendshipController @Autowired constructor(
         return result.toDTO()
     }
 
-    override fun deleteFriendship(params: DeleteFriendRequestDTO): StringDTO {
+    override fun deleteFriendship(params: FriendshipDeleteRequestDTO): StringDTO {
         val result = friendshipService.deleteFriendship(params.userId, params.friendId)
         return result.toDTO()
     }

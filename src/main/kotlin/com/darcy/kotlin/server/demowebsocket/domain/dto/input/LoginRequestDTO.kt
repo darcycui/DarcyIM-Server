@@ -8,4 +8,4 @@ data class LoginRequestDTO(
 
     @field:NotBlank(message = "密码不能为空")
     val password: String = ""
-): IRequestDTO
+) : IRequestDTO

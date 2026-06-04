@@ -8,4 +8,4 @@ data class DHExchangeRequestDTO(
 
     @field:NotBlank(message = "DH公钥不能为空")
     var publicKey: String = ""
-)
+) : IRequestDTO
