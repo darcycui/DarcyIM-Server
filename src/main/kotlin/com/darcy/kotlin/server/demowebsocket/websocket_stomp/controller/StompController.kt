@@ -31,7 +31,9 @@ class StompController @Autowired constructor(
             ?: throw X3DHException.N_KEY_HEADER_NOT_EXIST
         val PN = sha.getFirstNativeHeader("PN_KEY")?.toLongOrNull()
             ?: throw X3DHException.PN_KEY_HEADER_NOT_EXIST
-        stompService.sendPrivate(privateMessage, fromUserId, dhPublicKey, N, PN)
+        val url = sha.getFirstNativeHeader("url")
+            ?: throw X3DHException.URL_HEADER_NOT_EXIST
+        stompService.sendPrivate(privateMessage, fromUserId, dhPublicKey, N, PN, url)
     }
 
     override fun sendAllGroup(sha: SimpMessageHeaderAccessor, @Payload groupMessage: GroupMessageDTO) {

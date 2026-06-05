@@ -27,17 +27,18 @@ class STOMPService @Autowired constructor(
         fromUserId: String,
         dhPublicKey: String,
         N: Long,
-        PN: Long
+        PN: Long,
+        url: String
     ) {
         val recipient = privateMessage.receiverName
         kotlin.runCatching {
-            val headers =
-                mapOf(
-                    "fromUserId" to fromUserId,
-                    "dhPublicKey" to dhPublicKey,
-                    "N_KEY" to N,
-                    "PN_KEY" to PN,
-                )
+            val headers = mapOf(
+                "fromUserId" to fromUserId,
+                "dhPublicKey" to dhPublicKey,
+                "N_KEY" to N,
+                "PN_KEY" to PN,
+                "url" to url
+            )
             val sendUser = userService.queryUserById(privateMessage.senderId)
             val receiveUser = userService.queryUserById(privateMessage.receiverId)
             val savedMessage = privateMessageService.createMessage(

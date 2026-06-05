@@ -33,8 +33,8 @@ class StompWebsocketConfig @Autowired constructor(
 
         private const val SUBSCRIBE_GROUP_MESSAGE_PREFIX = "/topic"
         private const val SUBSCRIBE_SINGLE_MESSAGE_PREFIX = "/queue"
-        private const val CLIENT_SEND_MESSAGE_PREFIX = "/app"
-        private const val SERVER_END_MESSAGE_PREFIX = "/user"
+        const val CLIENT_SEND_MESSAGE_PREFIX = "/app"
+        const val SERVER_SEND_MESSAGE_PREFIX = "/user"
     }
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
@@ -45,7 +45,7 @@ class StompWebsocketConfig @Autowired constructor(
             // 单聊: client 发送消息前缀
             setApplicationDestinationPrefixes(CLIENT_SEND_MESSAGE_PREFIX)
             // 单聊: server 发送消息前缀
-            setUserDestinationPrefix(SERVER_END_MESSAGE_PREFIX)
+            setUserDestinationPrefix(SERVER_SEND_MESSAGE_PREFIX)
         }
     }
 
