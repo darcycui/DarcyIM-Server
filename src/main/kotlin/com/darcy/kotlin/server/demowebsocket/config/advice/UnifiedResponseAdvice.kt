@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
 
 @ControllerAdvice
-@Priority(1)
+@Priority(1) // 优先级高于 @RestControllerAdvice
 class UnifiedResponseAdvice : ResponseBodyAdvice<Any?> {
 
     override fun supports(returnType: MethodParameter, converterType: Class<out HttpMessageConverter<*>>): Boolean {

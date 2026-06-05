@@ -1,5 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.api
 
+import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverMessageReadStatusMarkRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverOfflineMessageSyncRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.SenderOfflineMessageReadSyncRequestDTO

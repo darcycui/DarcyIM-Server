@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.IMessageReadApi
+import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverMessageReadStatusMarkRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverOfflineMessageSyncRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.SenderOfflineMessageReadSyncRequestDTO
@@ -15,6 +16,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@Encrypted
 class MessageReadController @Autowired constructor(
     private val messageReadStatusService: MessageReadStatusService,
     private val websocket: SimpMessagingTemplate

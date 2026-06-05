@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
 
 @ControllerAdvice
-@Priority(2)
+@Priority(2) //  优先级低于 UnifiedResponseAdvice
 class EncryptResponseBodyAdvice @Autowired constructor(
     private val tokenProvider: JwtTokenProvider,
     private val userService: UserService,
