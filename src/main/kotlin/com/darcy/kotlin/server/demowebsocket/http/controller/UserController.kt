@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.IUserApi
+import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.UserQueryEmailRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.UserQueryIdRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.UserQueryPhoneRequestDTO
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@Encrypted
 class UserController @Autowired constructor(val userService: UserService) : IUserApi {
 
     override fun updateUser(params: UserUpdateRequestDTO): UserDTO {

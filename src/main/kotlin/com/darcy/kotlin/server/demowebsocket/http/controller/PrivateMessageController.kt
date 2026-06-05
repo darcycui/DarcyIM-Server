@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.IPrivateMessageApi
+import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.PrivateMessageQueryRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.PrivateMessageSendRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@Encrypted
 class PrivateMessageController @Autowired constructor(
     val privateMessageService: PrivateMessageService,
 ) : IPrivateMessageApi {

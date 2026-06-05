@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.IGroupInviteApi
+import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.domain.dto.group.GroupInviteDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.group.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupInviteQueryFromRequestDTO
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@Encrypted
 class GroupInviteController @Autowired constructor(
     private val groupInviteService: GroupInviteService
 ) : IGroupInviteApi {

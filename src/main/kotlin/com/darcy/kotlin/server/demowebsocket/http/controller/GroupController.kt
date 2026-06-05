@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.IGroupApi
+import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.domain.dto.group.GroupDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.group.GroupMemberDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.group.toDTO
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@Encrypted
 class GroupController @Autowired constructor(
     private val groupService: GroupService,
     private val groupMemberService: GroupMemberService,

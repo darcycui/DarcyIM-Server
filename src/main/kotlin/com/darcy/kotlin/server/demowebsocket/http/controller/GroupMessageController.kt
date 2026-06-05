@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.IGroupMessageApi
+import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupMessageQueryRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.GroupMessageSendRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@Encrypted
 class GroupMessageController @Autowired constructor(
     private val groupMessageService: GroupMessageService
 ) : IGroupMessageApi {

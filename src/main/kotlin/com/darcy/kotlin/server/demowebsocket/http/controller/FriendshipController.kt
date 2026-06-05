@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.IFriendshipApi
+import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.FriendshipDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.friend.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.CommonRequestDTO
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@Encrypted
 class FriendshipController @Autowired constructor(
     private val friendshipService: FriendshipService
 ) : IFriendshipApi {

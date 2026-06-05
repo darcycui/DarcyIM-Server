@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.IUploadFileApi
+import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
 import com.darcy.kotlin.server.demowebsocket.domain.dto.media.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.table.media.UploadFile
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile
 
 
 @RestController
+@Encrypted
 class UploadFileController @Autowired constructor(
     val uploadFileService: UploadFileService
 ) : IUploadFileApi {
