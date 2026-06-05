@@ -1,8 +1,10 @@
 package com.darcy.kotlin.server.demowebsocket.http.service
 
+import com.darcy.kotlin.server.demowebsocket.crypto.transport.TransportKeyManager
 import com.darcy.kotlin.server.demowebsocket.domain.table.dh.DHKeyExchange
 import com.darcy.kotlin.server.demowebsocket.http.repository.DHKeyExchangeRepository
 import com.darcy.kotlin.server.demowebsocket.http.x3dh.exchange.ECCExchangeHelper
+import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.utils.bytesToHexStr
 import com.darcy.kotlin.server.demowebsocket.utils.hexStrToBytes
 import com.darcy.kotlin.server.demowebsocket.utils.keyToString
@@ -21,12 +23,21 @@ class TransportService @Autowired constructor(
     fun dhKeyExchange(userId: Long, publicKey: String): DHKeyExchange {
         val user = userService.queryUserById(userId)
         val ephemeralKeyPair: KeyPair = ECCExchangeHelper.generateKeyPair()
+        DarcyLogger.info("dhKeyExchange: userId=$userId")
+        DarcyLogger.info("dhKeyExchange: 临时私钥=${ephemeralKeyPair.private.keyToString()}")
+        DarcyLogger.info("dhKeyExchange: 临时公钥=${ephemeralKeyPair.public.keyToString()}")
         val sharedSecret = ECCExchangeHelper.getSharedSecret(
             ephemeralKeyPair.private,
             publicKey.hexStrToBytes().toPublicKey()
         ).bytesToHexStr()
         testSharedSecret = sharedSecret
-        val item = dhKeyExchangeRepository.findByUserId(userId)
+        val existItem  = dhKeyExchangeRepository.findByUserId(userId)
+        val item = existItem?.apply {
+            this.remotePublicKey = publicKey
+            this.privateKey = ephemeralKeyPair.private.keyToString()
+            this.publicKey = ephemeralKeyPair.public.keyToString()
+            this.sharedSecret = sharedSecret // todo 1.内存保存 2.使用 KMS
+        }
             ?: DHKeyExchange(
                 user = user,
                 remotePublicKey = publicKey,
@@ -34,6 +45,8 @@ class TransportService @Autowired constructor(
                 publicKey = ephemeralKeyPair.public.keyToString(),
                 sharedSecret = sharedSecret, // todo 1.内存保存 2.使用 KMS
             )
-        return dhKeyExchangeRepository.save(item)
+        val result = dhKeyExchangeRepository.save(item)
+        TransportKeyManager.setTransportKey(userId, sharedSecret.hexStrToBytes())
+        return result
     }
 }

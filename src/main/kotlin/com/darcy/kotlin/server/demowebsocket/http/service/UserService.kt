@@ -68,6 +68,10 @@ class UserService @Autowired constructor(
         return userRepository.findByEmail(email) ?: throw UserException.USER_NOT_EXIST
     }
 
+    fun updateUser(user: User): User {
+        return userRepository.save(user)
+    }
+
     @Transactional
     fun updateUser(userId: Long, userUpdateRequestDTO: UserUpdateRequestDTO): User {
         val user = queryUserById(userId)

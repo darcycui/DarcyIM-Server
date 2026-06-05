@@ -1,9 +1,10 @@
 package com.darcy.kotlin.server.demowebsocket.domain.dto.input
 
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 
 data class X3DHPushKeysRequestDTO(
-    @field:NotBlank(message = "用户ID不能为空")
+    @field:NotNull(message = "用户ID不能为空")
     var userId: Long = 0,
 
     @field:NotBlank(message = "身份公钥不能为空")
@@ -17,18 +18,18 @@ data class X3DHPushKeysRequestDTO(
 ) : IRequestDTO
 
 data class X3DHPullKeysRequestDTO(
-    @field:NotBlank(message = "Alice用户ID不能为空")
+    @field:NotNull(message = "Alice用户ID不能为空")
     var aliceUserId: Long = 0,
 
-    @field:NotBlank(message = "Bob用户ID不能为空")
+    @field:NotNull(message = "Bob用户ID不能为空")
     var bobUserId: Long = 0
 ) : IRequestDTO
 
 data class X3DHPushHelloRequestDTO(
-    @field:NotBlank(message = "Alice用户ID不能为空")
+    @field:NotNull(message = "Alice用户ID不能为空")
     var aliceUserId: Long = 0,
 
-    @field:NotBlank(message = "Bob用户ID不能为空")
+    @field:NotNull(message = "Bob用户ID不能为空")
     var bobUserId: Long = 0,
 
     @field:NotBlank(message = "Alice的公钥不能为空")
@@ -43,10 +44,10 @@ data class X3DHPushHelloRequestDTO(
 
 
 data class X3DHPullHelloRequestDTO(
-    @field:NotBlank(message = "Alice用户ID不能为空")
+    @field:NotNull(message = "Alice用户ID不能为空")
     var aliceUserId: Long = 0,
 
-    @field:NotBlank(message = "Bob用户ID不能为空")
+    @field:NotNull(message = "Bob用户ID不能为空")
     var bobUserId: Long = 0,
 ) : IRequestDTO
 

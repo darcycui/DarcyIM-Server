@@ -49,6 +49,8 @@ logging:
     name: ./logs/myapp.log
   level:
     root: INFO
+    # 针对你的包名开启 DEBUG
+    com.darcy.kotlin.server.demowebsocket: DEBUG
     org.apache.tomcat: WARN  # 输出 Tomcat 详细日志
     org.springframework.web: DEBUG
     org.springframework.security: DEBUG

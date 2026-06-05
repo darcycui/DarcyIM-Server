@@ -1,7 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.controller
 
 import com.darcy.kotlin.server.demowebsocket.api.IConversationApi
-import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
+import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.domain.dto.conversation.ConversationDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.conversation.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.CommonRequestDTO
@@ -9,13 +9,13 @@ import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ConversationCreate
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ConversationQueryRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.user.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.table.conversation.Conversation
-import com.darcy.kotlin.server.demowebsocket.exception.code600.ParamsException
 import com.darcy.kotlin.server.demowebsocket.http.service.ConversationService
 import com.darcy.kotlin.server.demowebsocket.http.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@Encrypted
 class ConversationController @Autowired constructor(
     private val conversationService: ConversationService,
     private val userService: UserService,
