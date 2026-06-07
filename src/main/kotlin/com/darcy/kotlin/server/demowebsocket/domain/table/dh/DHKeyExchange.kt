@@ -49,7 +49,7 @@ open class DHKeyExchange(
     open var algorithm: String = "",
 
     @Column(name = "shared_secret", length = 256)
-    open var sharedSecret: String? = null,
+    open var sharedSecret: String = "",
 
     @Column(name = "is_completed")
     open var isCompleted: Boolean = false,

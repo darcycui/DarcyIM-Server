@@ -53,7 +53,7 @@ class StompInDecryptInterceptor : ChannelInterceptor {
                 )
                 val privateMessageDTO = JsonUtil.fromJson(
                     decryptedPayload.decodeToString(), PrivateMessageDTO::class.java
-                )
+                ) ?: PrivateMessageDTO(content= "解密失败")
                 // 解密成功后，将解密后的消息重新封装并返回
                 val newMessage = MessageBuilder.createMessage(
                     privateMessageDTO,

@@ -49,4 +49,8 @@ class TransportService @Autowired constructor(
         TransportKeyManager.setTransportKey(userId, sharedSecret.hexStrToBytes())
         return result
     }
+
+    fun queryDHKeyExchange(userId: Long): DHKeyExchange {
+        return dhKeyExchangeRepository.findByUserId(userId) ?: throw Exception("DHKeyExchange not found")
+    }
 }

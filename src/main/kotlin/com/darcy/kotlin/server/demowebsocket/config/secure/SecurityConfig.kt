@@ -1,4 +1,4 @@
-package com.darcy.kotlin.server.demowebsocket.config
+package com.darcy.kotlin.server.demowebsocket.config.secure
 
 import com.darcy.kotlin.server.demowebsocket.config.jwt.JsonAccessDeniedHandler
 import com.darcy.kotlin.server.demowebsocket.config.jwt.JsonAuthenticationEntryPoint

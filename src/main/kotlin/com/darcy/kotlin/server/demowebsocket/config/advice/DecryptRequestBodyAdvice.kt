@@ -27,6 +27,9 @@ class DecryptRequestBodyAdvice @Autowired constructor(
     private val tokenProvider: JwtTokenProvider,
     private val userService: UserService,
 ) : RequestBodyAdvice {
+    companion object {
+        private val TAG = DecryptRequestBodyAdvice::class.java.simpleName
+    }
     private val transformCipher: ITransportCipher = ChaCha20TransportCipher
 
     override fun supports(
@@ -45,7 +48,7 @@ class DecryptRequestBodyAdvice @Autowired constructor(
         targetType: Type,
         converterType: Class<out HttpMessageConverter<*>>
     ): HttpInputMessage {
-        DarcyLogger.debug("Decrypting request body...")
+        DarcyLogger.debug("$TAG Decrypting request body...")
         val servletRequest: HttpServletRequest = when (inputMessage) {
             is ServletServerHttpRequest -> inputMessage.servletRequest
             else -> {
@@ -58,15 +61,15 @@ class DecryptRequestBodyAdvice @Autowired constructor(
         val userId = userService.queryUserByUsername(username).id
         // 读取原始请求体并解密
         val originalBody = inputMessage.body.readAllBytes()
-        DarcyLogger.debug("Original request body: ${originalBody.decodeToString()}")
+        DarcyLogger.debug("$TAG Original request body: ${originalBody.decodeToString()}")
         val aad = "${servletRequest.method}:${servletRequest.requestURL}"
-        DarcyLogger.debug("AAD: $aad")
+        DarcyLogger.debug("$TAG AAD: $aad")
         val decryptedBody = transformCipher.decrypt(
             userId = userId,
             ciphertext = originalBody.decodeToString().hexStrToBytes(),
             aad = aad.toByteArray(StandardCharsets.UTF_8),
         )
-        DarcyLogger.debug("Decrypted request body: ${String(decryptedBody)}")
+        DarcyLogger.debug("$TAG Decrypted request body: ${String(decryptedBody)}")
 
         // 返回新的 HttpInputMessage，包含解密后的字节流
         return object : HttpInputMessage {
