@@ -21,7 +21,7 @@ class StompController @Autowired constructor(
     private val messageReadStatusService: MessageReadStatusService,
     private val websocket: SimpMessagingTemplate
 ) : IStomp {
-    override fun sendPrivate(sha: SimpMessageHeaderAccessor, @Payload privateMessage: PrivateMessageDTO) {
+    override fun sendPrivate(sha: SimpMessageHeaderAccessor, @Payload privateMessage: String) {
         DarcyLogger.info("private message=$privateMessage")
         val sender = sha.user?.name ?: ""
         DarcyLogger.info("private sender: $sender message=$privateMessage")

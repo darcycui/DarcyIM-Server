@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 @RestControllerAdvice()
 @Priority(2) // 优先级高于 @EncryptResponseBodyAdvice
 @Encrypted  // 添加此注解，使异常响应也能被加密
+// todo: 继承 ResponseEntityExceptionHandler
 class GlobalExceptionAdvice {
     companion object {
         private val TAG = GlobalExceptionAdvice::class.simpleName

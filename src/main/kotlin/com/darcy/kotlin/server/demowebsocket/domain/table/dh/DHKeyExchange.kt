@@ -30,7 +30,7 @@ open class DHKeyExchange(
     @JoinColumn(name = "user_id", nullable = false, foreignKey = ForeignKey(name = "fk_dh_exchange_user"))
     open var user: User,
 
-    @Column(name = "session_id", nullable = false, length = 64, unique = true)
+    @Column(name = "session_id", nullable = false, length = 64)
     open var sessionId: String = "",
 
     @Column(name = "remote_public_key", nullable = false, length = 256)

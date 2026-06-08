@@ -16,7 +16,7 @@ import java.security.KeyPair
 var testSharedSecret: String = "" // 测试使用
 
 @Service
-class TransportService @Autowired constructor(
+class DHService @Autowired constructor(
     private val dhKeyExchangeRepository: DHKeyExchangeRepository,
     private val userService: UserService,
 ) {

@@ -1,19 +1,17 @@
 package com.darcy.kotlin.server.demowebsocket.crypto.transport
 
-import com.darcy.kotlin.server.demowebsocket.http.service.TransportService
+import com.darcy.kotlin.server.demowebsocket.http.service.DHService
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.utils.bytesToHexStr
-import com.darcy.kotlin.server.demowebsocket.utils.hexStrToBytes
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import kotlin.emptyArray
 
 @Component
 object TransportKeyManager {
     private const val TAG = "TransportKeyManager"
     private val transportKeyMap = mutableMapOf<Long, ByteArray>()
     @Autowired
-    private lateinit var transportService : TransportService
+    private lateinit var DHService : DHService
     fun getTransportKey(userId: Long): ByteArray {
         val key = transportKeyMap[userId] ?: run {
 //            val existKey = transportService.queryDHKeyExchange(userId).sharedSecret.hexStrToBytes()

@@ -10,7 +10,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor
 interface IStomp {
     @MessageMapping("/sendPrivateMessage")
 //    @SendToUser
-    fun sendPrivate(sha: SimpMessageHeaderAccessor, @Payload privateMessage: PrivateMessageDTO)
+    fun sendPrivate(sha: SimpMessageHeaderAccessor, @Payload privateMessage: String)
 
     @MessageMapping("/sendAllGroupMessage")
     fun sendAllGroup(sha: SimpMessageHeaderAccessor, @Payload groupMessage: GroupMessageDTO)

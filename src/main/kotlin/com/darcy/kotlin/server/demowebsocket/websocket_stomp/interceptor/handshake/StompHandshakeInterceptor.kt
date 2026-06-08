@@ -1,4 +1,4 @@
-package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor
+package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.handshake
 
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.utils.TokenUtil

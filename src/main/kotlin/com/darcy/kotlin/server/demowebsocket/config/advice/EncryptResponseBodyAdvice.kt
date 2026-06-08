@@ -9,11 +9,9 @@ import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.utils.JsonUtil
 import com.darcy.kotlin.server.demowebsocket.utils.TokenUtil
 import com.darcy.kotlin.server.demowebsocket.utils.bytesToHexStr
-import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.annotation.Priority
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.MethodParameter
-import org.springframework.core.annotation.Order
 import org.springframework.http.MediaType
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.http.server.ServerHttpRequest
@@ -32,6 +30,15 @@ class EncryptResponseBodyAdvice @Autowired constructor(
     companion object {
         // 日志标签
         private val TAG = EncryptResponseBodyAdvice::class.simpleName
+        private val noNeedEncryptList = listOf(
+            "/api/login",
+            "/api/register",
+            "/api/transport/dh/exchange",
+        )
+
+        fun noNeedEncrypt(request: String): Boolean {
+            return request in noNeedEncryptList
+        }
     }
 
     private val transformCipher: ITransportCipher = ChaCha20TransportCipher
@@ -46,7 +53,7 @@ class EncryptResponseBodyAdvice @Autowired constructor(
         // 2. 检查是否是异常处理器（可选）
         val isExceptionHandler = returnType.method?.isAnnotationPresent(ExceptionHandler::class.java) == true
         val needEncrypt = hasEncryptedAnnotation || isExceptionHandler
-        DarcyLogger.debug("$TAG Need encrypt: $needEncrypt")
+        DarcyLogger.debug("$TAG 是否需要拦截响应: $needEncrypt")
         return needEncrypt
     }
 
@@ -58,13 +65,14 @@ class EncryptResponseBodyAdvice @Autowired constructor(
         request: ServerHttpRequest,
         response: ServerHttpResponse
     ): Any? {
-        DarcyLogger.debug("$TAG Encrypting response body...")
+        DarcyLogger.debug("$TAG 拦截响应...")
+
         if (body == null) {
-            DarcyLogger.debug("$TAG Response body is null")
+            DarcyLogger.warn("$TAG 响应body为null")
             return null
         }
-        if (body is String) {
-            DarcyLogger.debug("$TAG Response body is String return it directly")
+        if (noNeedEncrypt(request.uri.path)) {
+            DarcyLogger.warn("$TAG 响应无需加密")
             return body
         }
         val realRequest = (request as ServletServerHttpRequest)
@@ -73,14 +81,15 @@ class EncryptResponseBodyAdvice @Autowired constructor(
         val userId = userService.queryUserByUsername(username).id
         // 将响应对象转为 JSON 字符串
         val json = JsonUtil.toJson(body)
-        DarcyLogger.debug("$TAG Original Response body: $body")
+        DarcyLogger.debug("$TAG 原始响应body: $body")
+
         // 加密后返回加密字符串
         val ciphertext = transformCipher.encrypt(
             userId = userId,
             plaintext = json.toByteArray(),
-            aad = "${realRequest.method}:${realRequest.uri}".toByteArray()
+            aad = "${realRequest.method}:${realRequest.uri.toString()}".toByteArray()
         ).bytesToHexStr()
-        DarcyLogger.debug("$TAG Encrypted Response body: $ciphertext")
+        DarcyLogger.debug("$TAG 加密后响应body: $ciphertext")
         return ciphertext
     }
 }

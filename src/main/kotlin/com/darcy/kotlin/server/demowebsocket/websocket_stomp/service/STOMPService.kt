@@ -1,5 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.service
 
+import com.darcy.kotlin.server.demowebsocket.crypto.transport.websocket.WebsocketCrypto
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.toEntity
@@ -7,6 +8,7 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.conversation.Conversat
 import com.darcy.kotlin.server.demowebsocket.exception.code800.STOMPException
 import com.darcy.kotlin.server.demowebsocket.http.service.*
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.utils.JsonUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
@@ -23,17 +25,21 @@ class STOMPService @Autowired constructor(
 //    private val simpUserRegistry: SimpUserRegistry
 ) {
     fun sendPrivate(
-        privateMessage: PrivateMessageDTO,
+        encryptMessage: String,
         fromUserId: String,
         dhPublicKey: String,
         N: Long,
         PN: Long,
         url: String
     ) {
-        val recipient = privateMessage.receiverName
         kotlin.runCatching {
+            val decryptMessage = WebsocketCrypto.decrypt(fromUserId.toLongOrNull() ?: 0L, encryptMessage, url)
+            val privateMessage = JsonUtil.fromJson(decryptMessage, PrivateMessageDTO::class.java)
+                ?: throw STOMPException.STOMP_PRIVATE_MESSAGE_FORMAT_ERROR
+            val recipient = privateMessage.receiverName
             val headers = mapOf(
                 "fromUserId" to fromUserId,
+                "toUserId" to privateMessage.receiverId,
                 "dhPublicKey" to dhPublicKey,
                 "N_KEY" to N,
                 "PN_KEY" to PN,
@@ -54,11 +60,12 @@ class STOMPService @Autowired constructor(
             )
             DarcyLogger.info("创建消息已读状态: msgId=${savedMessage.msgId}, receiverId=${privateMessage.receiverId}")
             DarcyLogger.warn("单发消息 -->$recipient headers=$headers message=$privateMessage")
+            val encryptMessageNew = WebsocketCrypto.encrypt(privateMessage.receiverId, decryptMessage, url)
             // Spring STOMP 单播 Unicast
             websocket.convertAndSendToUser(
                 recipient,
                 "/queue/message",
-                privateMessage,
+                encryptMessageNew,
                 headers
             )
 

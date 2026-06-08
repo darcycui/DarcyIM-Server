@@ -1,4 +1,4 @@
-package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor
+package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -17,7 +17,11 @@ import java.lang.Exception
  * In拦截器 拦截服务器收到的 确认帧
  */
 @Component
-class StompInReceiptInterceptor : ChannelInterceptor {
+class InReceiptInterceptor : ChannelInterceptor {
+    companion object {
+        private val TAG = InReceiptInterceptor::class.java.simpleName
+    }
+
 
     @Autowired
     @Lazy
@@ -30,28 +34,28 @@ class StompInReceiptInterceptor : ChannelInterceptor {
             StompCommand.SEND -> {
                 val receipt = accessor.receipt
                 if (StringUtils.hasText(receipt)) {
-                    println("[Receipt] 收到带确认帧的消息: command=${accessor.command}, receipt=$receipt, destination=${accessor.destination}")
+                    println("$TAG 收到带确认帧的消息: command=${accessor.command}, receipt=$receipt, destination=${accessor.destination}")
                 }
             }
 
             StompCommand.SUBSCRIBE -> {
                 val receipt = accessor.receipt
                 if (StringUtils.hasText(receipt)) {
-                    println("[Receipt] 收到带确认帧的订阅: command=${accessor.command}, receipt=$receipt, destination=${accessor.destination}")
+                    println("$TAG 收到带确认帧的订阅: command=${accessor.command}, receipt=$receipt, destination=${accessor.destination}")
                 }
             }
 
             StompCommand.UNSUBSCRIBE -> {
                 val receipt = accessor.receipt
                 if (StringUtils.hasText(receipt)) {
-                    println("[Receipt] 收到带确认帧的取消订阅: command=${accessor.command}, receipt=$receipt")
+                    println("$TAG 收到带确认帧的取消订阅: command=${accessor.command}, receipt=$receipt")
                 }
             }
 
             StompCommand.DISCONNECT -> {
                 val receipt = accessor.receipt
                 if (StringUtils.hasText(receipt)) {
-                    println("[Receipt] 收到带确认帧的断开连接: command=${accessor.command}, receipt=$receipt")
+                    println("$TAG 收到带确认帧的断开连接: command=${accessor.command}, receipt=$receipt")
                 }
             }
 
@@ -71,15 +75,15 @@ class StompInReceiptInterceptor : ChannelInterceptor {
 
         if (StringUtils.hasText(receipt)) {
             if (sent) {
-                println("[Receipt] 消息已成功处理，准备发送确认帧: receipt=$receipt")
+                println("$TAG 消息已成功处理，准备发送确认帧: receipt=$receipt")
                 // 这里可以触发业务逻辑，如记录日志到数据库
                 // 这里手动发送 RECEIPT 帧
                 sendReceiptIfNeeded(message)
             } else if (ex != null) {
-                println("[Receipt] 消息处理失败: receipt=$receipt, error=${ex.message}")
+                println("$TAG 消息处理失败: receipt=$receipt, error=${ex.message}")
             }
         } else {
-            println("[Receipt] 确认帧未指定，忽略: command=${accessor.command}, destination=${accessor.destination}")
+            println("$TAG 确认帧未指定，忽略: command=${accessor.command}, destination=${accessor.destination}")
         }
     }
 
@@ -105,7 +109,7 @@ class StompInReceiptInterceptor : ChannelInterceptor {
         if (StringUtils.hasText(receipt)) {
             sendReceiptFrame(receipt, accessor)
         } else {
-            println("[Receipt] 确认帧 null")
+            println("$TAG 确认帧 null")
         }
     }
 
@@ -115,7 +119,7 @@ class StompInReceiptInterceptor : ChannelInterceptor {
     private fun sendReceiptFrame(receiptId: String, originalAccessor: StompHeaderAccessor) {
         try {
             val sessionId = originalAccessor.sessionId
-            println("[Receipt] 开始构建 RECEIPT 帧: receipt-id=$receiptId, sessionId=$sessionId")
+            println("$TAG 开始构建 RECEIPT 帧: receipt-id=$receiptId, sessionId=$sessionId")
 
             // 创建 RECEIPT 帧的 HeaderAccessor
             val receiptAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT)
@@ -140,20 +144,20 @@ class StompInReceiptInterceptor : ChannelInterceptor {
             // 发送到客户端输出通道
             clientOutboundChannel.send(receiptMessage)
 
-            println("[Receipt] RECEIPT 帧已发送: receipt-id=$receiptId, sessionId=$sessionId")
-            println("[Receipt] 帧头信息: ${receiptAccessor.toNativeHeaderMap()}")
+            println("$TAG RECEIPT 帧已发送: receipt-id=$receiptId, sessionId=$sessionId")
+            println("$TAG 帧头信息: ${receiptAccessor.toNativeHeaderMap()}")
 
         } catch (e: IllegalStateException) {
             // 会话已关闭，忽略此异常
             if (e.message?.contains("Cannot send a message when session is closed") == true) {
-                println("[Receipt] 会话已关闭，无法发送 RECEIPT 帧: receipt-id=$receiptId, error=${e.message}")
+                println("$TAG 会话已关闭，无法发送 RECEIPT 帧: receipt-id=$receiptId, error=${e.message}")
                 return
             } else {
-                println("[Receipt] 发送 RECEIPT 帧失败: ${e.message}")
+                println("$TAG 发送 RECEIPT 帧失败: ${e.message}")
                 e.printStackTrace()
             }
         } catch (e: Exception) {
-            println("[Receipt] 发送 RECEIPT 帧失败: ${e.message}")
+            println("$TAG 发送 RECEIPT 帧失败: ${e.message}")
             e.printStackTrace()
         }
     }

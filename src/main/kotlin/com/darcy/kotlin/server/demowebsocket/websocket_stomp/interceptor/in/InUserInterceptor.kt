@@ -1,4 +1,4 @@
-package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor
+package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`
 
 import com.darcy.kotlin.server.demowebsocket.config.jwt.JwtTokenProvider
 import com.darcy.kotlin.server.demowebsocket.http.service.UserService
@@ -23,7 +23,7 @@ import java.lang.Exception
  * In拦截器 拦截服务端收到的消息
  */
 @Component
-class StompInUserInterceptor @Autowired constructor(
+class InUserInterceptor @Autowired constructor(
     @Lazy
     val simpUserRegistry: SimpUserRegistry,
     val tokenProvider: JwtTokenProvider,

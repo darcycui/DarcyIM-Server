@@ -1,10 +1,12 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.config
 
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.exception.WebSocketExceptionDecorator
-import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.StompHandshakeInterceptor
-import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.StompInReceiptInterceptor
-import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.StompInUserInterceptor
-import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.StompOutInterceptor
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.handshake.StompHandshakeInterceptor
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`.InDecryptInterceptor
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`.InReceiptInterceptor
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`.InUserInterceptor
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.out.OutEncryptInterceptor
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.out.OutReceiptInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.converter.MessageConverter
@@ -19,10 +21,12 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @Configuration
 @EnableWebSocketMessageBroker
 class StompWebsocketConfig @Autowired constructor(
-    val stompInUserInterceptor: StompInUserInterceptor,
-    val stompInReceiptInterceptor: StompInReceiptInterceptor,
-    val stompHandshakeInterceptor: StompHandshakeInterceptor,
-    val stompOutInterceptor: StompOutInterceptor,
+    val inUserInterceptor: InUserInterceptor,
+    val inReceiptInterceptor: InReceiptInterceptor,
+    val outReceiptInterceptor: OutReceiptInterceptor,
+    val handshakeInterceptor: StompHandshakeInterceptor,
+    val inDecryptInterceptor: InDecryptInterceptor,
+    val outEncryptInterceptor: OutEncryptInterceptor,
     val webSocketExceptionDecorator: WebSocketExceptionDecorator
 ) : WebSocketMessageBrokerConfigurer {
     // todo 如何开启确认帧 Receipt
@@ -46,6 +50,8 @@ class StompWebsocketConfig @Autowired constructor(
             setApplicationDestinationPrefixes(CLIENT_SEND_MESSAGE_PREFIX)
             // 单聊: server 发送消息前缀
             setUserDestinationPrefix(SERVER_SEND_MESSAGE_PREFIX)
+            // 配置 brokerChannel 拦截器
+//            configureBrokerChannel().interceptors(outEncryptInterceptor)
         }
     }
 
@@ -55,12 +61,12 @@ class StompWebsocketConfig @Autowired constructor(
             // 添加原生 STOMP 端点
             addEndpoint(WEBSOCKET_PATH)
                 .setAllowedOriginPatterns("*", "null")
-                .addInterceptors(stompHandshakeInterceptor)
+                .addInterceptors(handshakeInterceptor)
 
             // 添加 STOMP 端点，并开启 SockJS 支持
             addEndpoint(WEBSOCKET_PATH_JS)
                 .setAllowedOriginPatterns("*", "null")
-                .addInterceptors(stompHandshakeInterceptor)
+                .addInterceptors(handshakeInterceptor)
                 .withSockJS()
                 .setHeartbeatTime(HEARTBEAT_PERIOD)
         }
@@ -77,7 +83,7 @@ class StompWebsocketConfig @Autowired constructor(
             maxPoolSize = 4
             queueCapacity = 10_000
         })
-        registration.interceptors(stompInUserInterceptor, stompInReceiptInterceptor)
+        registration.interceptors(inUserInterceptor, inReceiptInterceptor)
     }
 
     /**
@@ -89,7 +95,7 @@ class StompWebsocketConfig @Autowired constructor(
             maxPoolSize = 4
             queueCapacity = 10_000
         })
-        registration.interceptors(stompOutInterceptor)
+        registration.interceptors(outReceiptInterceptor)
     }
 
     override fun configureMessageConverters(messageConverters: MutableList<MessageConverter>): Boolean {
