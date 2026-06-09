@@ -4,6 +4,8 @@ import com.darcy.kotlin.server.demowebsocket.config.JwtToken.JWT_TOKEN
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil
 import com.darcy.kotlin.server.demowebsocket.utils.TokenUtil
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.config.StompWebsocketConfig.Companion.CLIENT_SEND_MESSAGE_PREFIX
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.config.StompWebsocketConfig.Companion.SEND_PRIVATE_MESSAGE_URL
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -26,7 +28,6 @@ import java.lang.reflect.Type
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 import kotlin.test.assertEquals
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -135,7 +136,8 @@ class WebSocketPrivateTests {
             val receiptLatch = CountDownLatch(1)
 
             // 订阅主题
-            val queueSubscription = session1.subscribe("/user/queue/message", object : StompSessionHandlerAdapter() {
+            val url = CLIENT_SEND_MESSAGE_PREFIX + SEND_PRIVATE_MESSAGE_URL
+            val queueSubscription = session1.subscribe(url, object : StompSessionHandlerAdapter() {
                 override fun handleFrame(headers: StompHeaders, payload: Any?) {
                     println("1--Received Queue headers-->: ${headers.entries}")
                     println("1--Received Queue message-->: $payload ")
@@ -153,7 +155,7 @@ class WebSocketPrivateTests {
             }
             Thread.sleep(500) // 等待订阅确认日志
 
-            val queueSubscription2 = session2.subscribe("/user/queue/message", object : StompSessionHandlerAdapter() {
+            val queueSubscription2 = session2.subscribe(url, object : StompSessionHandlerAdapter() {
                 override fun handleFrame(headers: StompHeaders, payload: Any?) {
                     println("2--Received Queue headers-->: ${headers.entries}")
                     println("2--Received Queue message-->: $payload")

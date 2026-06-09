@@ -1,6 +1,5 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.service
 
-import com.darcy.kotlin.server.demowebsocket.crypto.transport.websocket.WebsocketCrypto
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.toEntity
@@ -9,6 +8,9 @@ import com.darcy.kotlin.server.demowebsocket.exception.code800.STOMPException
 import com.darcy.kotlin.server.demowebsocket.http.service.*
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.utils.JsonUtil
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.config.StompWebsocketConfig.Companion.SEND_ALL_GROUP_MESSAGE_URL
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.config.StompWebsocketConfig.Companion.SEND_PRIVATE_MESSAGE_URL
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.config.StompWebsocketConfig.Companion.SEND_TARGET_GROUP_MESSAGE_URL_PREFIX
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
@@ -26,14 +28,16 @@ class STOMPService @Autowired constructor(
 ) {
     fun sendPrivate(
         encryptMessage: String,
-        fromUserId: String,
+        fromUserId: Long,
+        toUserId: Long,
         dhPublicKey: String,
         N: Long,
         PN: Long,
         url: String
     ) {
         kotlin.runCatching {
-            val decryptMessage = WebsocketCrypto.decrypt(fromUserId.toLongOrNull() ?: 0L, encryptMessage, url)
+//            val decryptMessage = WebsocketCrypto.decrypt(fromUserId, encryptMessage, url)
+            val decryptMessage = encryptMessage
             val privateMessage = JsonUtil.fromJson(decryptMessage, PrivateMessageDTO::class.java)
                 ?: throw STOMPException.STOMP_PRIVATE_MESSAGE_FORMAT_ERROR
             val recipient = privateMessage.receiverName
@@ -60,11 +64,12 @@ class STOMPService @Autowired constructor(
             )
             DarcyLogger.info("创建消息已读状态: msgId=${savedMessage.msgId}, receiverId=${privateMessage.receiverId}")
             DarcyLogger.warn("单发消息 -->$recipient headers=$headers message=$privateMessage")
-            val encryptMessageNew = WebsocketCrypto.encrypt(privateMessage.receiverId, decryptMessage, url)
+//            val encryptMessageNew = WebsocketCrypto.encrypt(toUserId, decryptMessage, url)
+            val encryptMessageNew = decryptMessage
             // Spring STOMP 单播 Unicast
             websocket.convertAndSendToUser(
                 recipient,
-                "/queue/message",
+                SEND_PRIVATE_MESSAGE_URL,
                 encryptMessageNew,
                 headers
             )
@@ -96,9 +101,9 @@ class STOMPService @Autowired constructor(
 
     fun sendAllGroup(groupMessage: GroupMessageDTO) {
         kotlin.runCatching {
-            DarcyLogger.warn("群发消息All -->/topic/message $groupMessage")
+            DarcyLogger.warn("群发消息All --> $groupMessage")
             // Spring STOMP 广播 Broadcast - 广播给所有订阅者
-            websocket.convertAndSend("/topic/message", groupMessage)
+            websocket.convertAndSend(SEND_ALL_GROUP_MESSAGE_URL, groupMessage)
             val sender = userService.queryUserById(groupMessage.senderId)
             val group = groupService.queryGroupById(groupMessage.groupId)
             val savedMessage = groupMessageService.createMessage(groupMessage.toEntity(sender, group))
@@ -129,9 +134,9 @@ class STOMPService @Autowired constructor(
     fun sendTargetGroup(groupMessage: GroupMessageDTO) {
         kotlin.runCatching {
             val groupId = groupMessage.groupId
-            DarcyLogger.warn("群发消息 -->/topic/group/$groupId $groupMessage")
+            DarcyLogger.warn("群发消息 --> $groupId $groupMessage")
             // Spring STOMP 广播 Broadcast - 只发送给指定群组的订阅者
-            websocket.convertAndSend("/topic/group/$groupId", groupMessage)
+            websocket.convertAndSend("$SEND_TARGET_GROUP_MESSAGE_URL_PREFIX$groupId", groupMessage)
             val sender = userService.queryUserById(groupMessage.senderId)
             val group = groupService.queryGroupById(groupMessage.groupId)
             val savedMessage = groupMessageService.createMessage(groupMessage.toEntity(sender, group))

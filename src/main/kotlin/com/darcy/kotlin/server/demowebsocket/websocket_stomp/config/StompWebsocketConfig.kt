@@ -6,7 +6,6 @@ import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`.In
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`.InReceiptInterceptor
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`.InUserInterceptor
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.out.OutEncryptInterceptor
-import com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.out.OutReceiptInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.converter.MessageConverter
@@ -23,13 +22,11 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 class StompWebsocketConfig @Autowired constructor(
     val inUserInterceptor: InUserInterceptor,
     val inReceiptInterceptor: InReceiptInterceptor,
-    val outReceiptInterceptor: OutReceiptInterceptor,
     val handshakeInterceptor: StompHandshakeInterceptor,
     val inDecryptInterceptor: InDecryptInterceptor,
     val outEncryptInterceptor: OutEncryptInterceptor,
     val webSocketExceptionDecorator: WebSocketExceptionDecorator
 ) : WebSocketMessageBrokerConfigurer {
-    // todo 如何开启确认帧 Receipt
     companion object {
         private const val WEBSOCKET_PATH = "/stomp-ws"
         private const val WEBSOCKET_PATH_JS = "/stomp-sockjs"
@@ -39,6 +36,11 @@ class StompWebsocketConfig @Autowired constructor(
         private const val SUBSCRIBE_SINGLE_MESSAGE_PREFIX = "/queue"
         const val CLIENT_SEND_MESSAGE_PREFIX = "/app"
         const val SERVER_SEND_MESSAGE_PREFIX = "/user"
+        const val SEND_PRIVATE_MESSAGE_URL = "$SUBSCRIBE_SINGLE_MESSAGE_PREFIX/message"
+        const val SEND_PRIVATE_MESSAGE_READ_URL = "$SUBSCRIBE_SINGLE_MESSAGE_PREFIX/message/read"
+        const val SEND_ALL_GROUP_MESSAGE_URL = "$SUBSCRIBE_GROUP_MESSAGE_PREFIX/message"
+        const val SEND_TARGET_GROUP_MESSAGE_URL_PREFIX = "$SUBSCRIBE_GROUP_MESSAGE_PREFIX/group/message/"
+
     }
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
@@ -51,7 +53,9 @@ class StompWebsocketConfig @Autowired constructor(
             // 单聊: server 发送消息前缀
             setUserDestinationPrefix(SERVER_SEND_MESSAGE_PREFIX)
             // 配置 brokerChannel 拦截器
-//            configureBrokerChannel().interceptors(outEncryptInterceptor)
+            configureBrokerChannel().interceptors(
+//                outEncryptInterceptor
+            )
         }
     }
 
@@ -83,7 +87,9 @@ class StompWebsocketConfig @Autowired constructor(
             maxPoolSize = 4
             queueCapacity = 10_000
         })
-        registration.interceptors(inUserInterceptor, inReceiptInterceptor)
+        registration.interceptors(
+            inUserInterceptor, inReceiptInterceptor, inDecryptInterceptor
+        )
     }
 
     /**
@@ -95,7 +101,9 @@ class StompWebsocketConfig @Autowired constructor(
             maxPoolSize = 4
             queueCapacity = 10_000
         })
-        registration.interceptors(outReceiptInterceptor)
+        registration.interceptors(
+            outEncryptInterceptor
+        )
     }
 
     override fun configureMessageConverters(messageConverters: MutableList<MessageConverter>): Boolean {

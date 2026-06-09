@@ -2,12 +2,12 @@ package com.darcy.kotlin.server.demowebsocket.websocket_stomp.controller
 
 import com.darcy.kotlin.server.demowebsocket.domain.dto.input.ReceiverMessageReadStatusMarkRequestDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
-import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.toDTO
 import com.darcy.kotlin.server.demowebsocket.exception.code1000.X3DHException
 import com.darcy.kotlin.server.demowebsocket.http.service.MessageReadStatusService
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.api.IStomp
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.config.StompWebsocketConfig.Companion.SEND_PRIVATE_MESSAGE_READ_URL
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.service.STOMPService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.handler.annotation.Payload
@@ -26,14 +26,15 @@ class StompController @Autowired constructor(
         val sender = sha.user?.name ?: ""
         DarcyLogger.info("private sender: $sender message=$privateMessage")
         val dhPublicKey = sha.getFirstNativeHeader("dhPublicKey") ?: ""
-        val fromUserId = sha.getFirstNativeHeader("fromUserId") ?: throw X3DHException.FROM_USER_ID_HEADER_NOT_EXIST
+        val fromUserId = sha.getFirstNativeHeader("fromUserId")?.toLongOrNull() ?: throw X3DHException.FROM_USER_ID_HEADER_NOT_EXIST
+        val toUserId = sha.getFirstNativeHeader("toUserId")?.toLongOrNull() ?:  throw X3DHException.TO_USER_ID_HEADER_NOT_EXIST
         val N = sha.getFirstNativeHeader("N_KEY")?.toLongOrNull()
             ?: throw X3DHException.N_KEY_HEADER_NOT_EXIST
         val PN = sha.getFirstNativeHeader("PN_KEY")?.toLongOrNull()
             ?: throw X3DHException.PN_KEY_HEADER_NOT_EXIST
         val url = sha.getFirstNativeHeader("url")
             ?: throw X3DHException.URL_HEADER_NOT_EXIST
-        stompService.sendPrivate(privateMessage, fromUserId, dhPublicKey, N, PN, url)
+        stompService.sendPrivate(privateMessage, fromUserId, toUserId, dhPublicKey, N, PN, url)
     }
 
     override fun sendAllGroup(sha: SimpMessageHeaderAccessor, @Payload groupMessage: GroupMessageDTO) {
@@ -57,7 +58,7 @@ class StompController @Autowired constructor(
         val result = messageReadStatusService.receiverGetMessageListReadStatus(userId, msgIds)
         websocket.convertAndSendToUser(
             receiverMessageReadStatusMarkInputDTO.targetName,
-            "/queue/message/read",
+            SEND_PRIVATE_MESSAGE_READ_URL,
             result.toDTO()
         )
     }

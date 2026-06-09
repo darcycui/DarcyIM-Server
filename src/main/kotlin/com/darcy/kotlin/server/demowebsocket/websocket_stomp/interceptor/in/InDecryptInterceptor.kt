@@ -46,7 +46,8 @@ class InDecryptInterceptor : ChannelInterceptor {
         val url = accessor.getFirstNativeHeader("url") ?: ""
         DarcyLogger.info("$TAG destination: $destination, receipt: $receipt, userId: $fromUserId, url: $url")
         // 只处理特定的消息目的地
-        if (destination?.startsWith(StompWebsocketConfig.CLIENT_SEND_MESSAGE_PREFIX) == true) {
+        val isClientMessage = destination?.startsWith(StompWebsocketConfig.CLIENT_SEND_MESSAGE_PREFIX) == true
+        if (isClientMessage) {
             val payload = message.payload
             DarcyLogger.warn("$TAG 入站消息（客户端发送到服务器）payload type: ${payload::class.java.simpleName}")
             if (payload is ByteArray) {

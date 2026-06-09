@@ -17,8 +17,9 @@ class X3DHException(
         val HELLO_MESSAGE_NOT_EXIST = X3DHException(1005, "helloMessage不存在")
         val DH_KEY_HEADER_NOT_EXIST = X3DHException(1004, "DH密钥不存在")
         val FROM_USER_ID_HEADER_NOT_EXIST = X3DHException(1006, "fromUserId header 不存在")
-        val N_KEY_HEADER_NOT_EXIST = X3DHException(1007, "N_KEY 不存在")
-        val PN_KEY_HEADER_NOT_EXIST = X3DHException(1008, "PN_KEY 不存在")
-        val URL_HEADER_NOT_EXIST = X3DHException(1009, "url 不存在")
+        val N_KEY_HEADER_NOT_EXIST = X3DHException(1007, "N_KEY header不存在")
+        val PN_KEY_HEADER_NOT_EXIST = X3DHException(1008, "PN_KEY header不存在")
+        val URL_HEADER_NOT_EXIST = X3DHException(1009, "url header不存在")
+        val TO_USER_ID_HEADER_NOT_EXIST = X3DHException(1010, "toUserId header 不存在")
     }
 }

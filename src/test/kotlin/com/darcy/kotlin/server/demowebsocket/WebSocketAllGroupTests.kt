@@ -3,6 +3,7 @@ package com.darcy.kotlin.server.demowebsocket
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.GroupMessageDTO
 import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil
 import com.darcy.kotlin.server.demowebsocket.utils.TokenUtil
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.config.StompWebsocketConfig.Companion.SEND_ALL_GROUP_MESSAGE_URL
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -99,7 +100,7 @@ class WebSocketAllGroupTests {
             val messageLatch = CountDownLatch(1)
 
             // 5. 订阅主题
-            val topicSubscription = session.subscribe("/topic/message", object : StompSessionHandlerAdapter() {
+            val topicSubscription = session.subscribe(SEND_ALL_GROUP_MESSAGE_URL, object : StompSessionHandlerAdapter() {
                 override fun handleFrame(headers: StompHeaders, payload: Any?) {
                     println("Received Topic message-->: $payload")
                     // 收到消息后 调用 messageLatch 的 countDown

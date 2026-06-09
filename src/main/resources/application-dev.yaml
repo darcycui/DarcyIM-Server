@@ -21,7 +21,7 @@ spring:
     username: root
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
-    show-sql: true  #控制台显示SQL
+    show-sql: false  #控制台显示SQL
     hibernate.ddl-auto: update #更新或者创建数据表结构
   flyway:
     enabled: true              # 开启 Flyway

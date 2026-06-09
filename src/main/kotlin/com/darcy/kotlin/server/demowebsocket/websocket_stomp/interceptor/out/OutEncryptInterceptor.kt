@@ -1,20 +1,17 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.out
 
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.ChaCha20TransportCipher
-import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
-import com.darcy.kotlin.server.demowebsocket.utils.JsonUtil
 import com.darcy.kotlin.server.demowebsocket.utils.bytesToHexStr
+import com.darcy.kotlin.server.demowebsocket.utils.hexStrToBytes
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.config.StompWebsocketConfig
 import org.springframework.messaging.Message
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 import org.springframework.messaging.support.ChannelInterceptor
 import org.springframework.messaging.support.MessageBuilder
-import org.springframework.messaging.support.MessageHeaderAccessor
 import org.springframework.stereotype.Component
-import org.springframework.util.StringUtils
-import java.lang.Exception
+import java.nio.charset.Charset
 
 /**
  * Out拦截器 拦截服务器发出的消息
@@ -43,26 +40,25 @@ class OutEncryptInterceptor : ChannelInterceptor {
         val toUserId: Long = accessor.getFirstNativeHeader("toUserId")?.toLongOrNull() ?: 0
         val url = accessor.getFirstNativeHeader("url") ?: ""
         DarcyLogger.info("$TAG destination: $destination, receipt: $receipt, userId: $fromUserId, url: $url")
+        val payload = message.payload
+        DarcyLogger.info("$TAG payload type: ${payload::class.java.simpleName} body: ${(payload as? ByteArray)?.decodeToString()}")
         // 只处理特定的消息目的地
-       if (destination?.startsWith(StompWebsocketConfig.SERVER_SEND_MESSAGE_PREFIX) == true) {
-            val payload = message.payload
-            DarcyLogger.info("$TAG 出站消息（服务器发送到客户端）payload type: ${payload::class.java.simpleName}")
-            if (payload is ByteArray) {
-                // 加密私聊消息
-                DarcyLogger.info("$TAG 需要加密")
-                val encryptedPayload = ChaCha20TransportCipher.encrypt(
-                    userId = toUserId,
-                    plaintext = payload,
-                    aad = "WS:$url".toByteArray(),
-                )
-                val newMessage = MessageBuilder.createMessage(
-                    encryptedPayload.bytesToHexStr(),
-                    message.headers
-                )
-                return newMessage
-            } else {
-                return message
-            }
+        val isPrivateMessage = destination?.startsWith(StompWebsocketConfig.SEND_PRIVATE_MESSAGE_URL) == true
+        if (isPrivateMessage && payload is ByteArray) {
+            DarcyLogger.info("$TAG 出站消息（服务器发送到客户端）")
+            // 加密私聊消息
+            DarcyLogger.info("$TAG 需要加密")
+            val encryptedPayload = ChaCha20TransportCipher.encrypt(
+                userId = toUserId,
+                plaintext = payload,
+                aad = "WS:$url".toByteArray(),
+            )
+            val newMessage = MessageBuilder.createMessage(
+//                encryptedPayload,
+                encryptedPayload.bytesToHexStr().toByteArray(),
+                message.headers
+            )
+            return newMessage
         } else {
             return message
         }

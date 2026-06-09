@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`
 
 import com.darcy.kotlin.server.demowebsocket.config.jwt.JwtTokenProvider
+import com.darcy.kotlin.server.demowebsocket.crypto.transport.TransportKeyManager
 import com.darcy.kotlin.server.demowebsocket.http.service.UserService
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.utils.TokenUtil
@@ -56,10 +57,13 @@ class InUserInterceptor @Autowired constructor(
                 }
 
                 StompCommand.DISCONNECT -> {
-                    val userId = user?.name ?: ""
-                    DarcyLogger.info("$TAG 用户$userId 下线了")
+                    val userName = user?.name ?: ""
+                    DarcyLogger.info("$TAG 用户$userName 下线了")
                     // 更新用户的最后活跃时间（即离线时间）
-                    userService.updateLastActiveTime(userId)
+                    userService.updateLastActiveTime(userName)
+                    // 删除用户传输密钥
+                    val userId = userService.queryUserByUsername(userName).id
+                    TransportKeyManager.removeTransportKey(userId)
                     userCount()
                 }
 

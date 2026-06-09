@@ -8,8 +8,8 @@ import com.darcy.kotlin.server.demowebsocket.domain.dto.input.SenderOfflineMessa
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.MessageReadStatusDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.toDTO
-import com.darcy.kotlin.server.demowebsocket.exception.code600.ParamsException
 import com.darcy.kotlin.server.demowebsocket.http.service.MessageReadStatusService
+import com.darcy.kotlin.server.demowebsocket.websocket_stomp.config.StompWebsocketConfig.Companion.SEND_PRIVATE_MESSAGE_READ_URL
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -37,7 +37,7 @@ class MessageReadController @Autowired constructor(
         // websocket 发送已读状态
         websocket.convertAndSendToUser(
             params.targetName,
-            "/queue/message/read",
+            SEND_PRIVATE_MESSAGE_READ_URL,
             result.toDTO()
         )
         return result.toDTO()
