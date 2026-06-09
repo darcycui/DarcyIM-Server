@@ -10,8 +10,9 @@ import org.springframework.stereotype.Component
 object TransportKeyManager {
     private const val TAG = "TransportKeyManager"
     private val transportKeyMap = mutableMapOf<Long, ByteArray>()
+
     @Autowired
-    private lateinit var DHService : DHService
+    private lateinit var DHService: DHService
     fun getTransportKey(userId: Long): ByteArray {
         val key = transportKeyMap[userId] ?: run {
 //            val existKey = transportService.queryDHKeyExchange(userId).sharedSecret.hexStrToBytes()
@@ -19,17 +20,31 @@ object TransportKeyManager {
 //            existKey
             byteArrayOf()
         }
-        DarcyLogger.debug("$TAG Get transport key for user $userId: ${key.bytesToHexStr()}")
+        if (userId <= 0) {
+            DarcyLogger.error("用户ID错误: $userId")
+            return byteArrayOf()
+        }
+        DarcyLogger.debug("$TAG 获取用户 $userId 的传输密钥: ${key.bytesToHexStr()}")
         return key
     }
 
     fun setTransportKey(userId: Long, key: ByteArray) {
+        if (userId <= 0) {
+            DarcyLogger.error("用户ID错误: $userId")
+            return
+        }
         transportKeyMap[userId] = key
         DarcyLogger.debug("$TAG Set transport key for user $userId: ${key.bytesToHexStr()}")
     }
+
     fun removeTransportKey(userId: Long) {
+        if (userId <= 0) {
+            DarcyLogger.error("用户ID错误: $userId")
+            return
+        }
         transportKeyMap.remove(userId)
     }
+
     fun clear() {
         transportKeyMap.clear()
     }

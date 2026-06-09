@@ -24,7 +24,7 @@ object ChaCha20TransportCipher : ITransportCipher {
         nonce: ByteArray,
         aad: ByteArray
     ): ByteArray {
-        kotlin.runCatching {
+        return kotlin.runCatching {
             DarcyLogger.debug("$TAG 加密...")
             DarcyLogger.debug("$TAG 明文: ${plaintext.decodeToString()}")
             DarcyLogger.debug("$TAG 加密Key: ${key.toHexString()}")
@@ -44,14 +44,14 @@ object ChaCha20TransportCipher : ITransportCipher {
             // 4. 将 Nonce 附加到密文前面
             // 格式: [Nonce (12字节)] + [Encrypted Data]
             // 解密时需要用到这个 Nonce
-            return nonce + encryptedData
+            nonce + encryptedData
         }.onSuccess {
             DarcyLogger.debug("$TAG 加密成功.")
         }.onFailure {
             DarcyLogger.error("$TAG 加密失败: ${it.message}")
             it.printStackTrace()
         }.getOrElse {
-            throw it
+            byteArrayOf()
         }
     }
 

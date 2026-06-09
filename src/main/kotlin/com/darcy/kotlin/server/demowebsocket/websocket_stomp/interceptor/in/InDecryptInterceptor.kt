@@ -44,14 +44,14 @@ class InDecryptInterceptor : ChannelInterceptor {
         val fromUserId: Long = accessor.getFirstNativeHeader("fromUserId")?.toLongOrNull() ?: 0
         val toUserId: Long = accessor.getFirstNativeHeader("toUserId")?.toLongOrNull() ?: 0
         val url = accessor.getFirstNativeHeader("url") ?: ""
-        DarcyLogger.info("$TAG destination: $destination, receipt: $receipt, userId: $fromUserId, url: $url")
+        DarcyLogger.info("$TAG destination: $destination, receipt: $receipt, fromUserId: $fromUserId, url: $url")
         // 只处理特定的消息目的地
         val isClientMessage = destination?.startsWith(StompWebsocketConfig.CLIENT_SEND_MESSAGE_PREFIX) == true
         if (isClientMessage) {
             val payload = message.payload
             DarcyLogger.warn("$TAG 入站消息（客户端发送到服务器）payload type: ${payload::class.java.simpleName}")
             if (payload is ByteArray) {
-                DarcyLogger.info("$TAG 需要解密")
+                DarcyLogger.info("$TAG 需要解密 fromUserId=$fromUserId")
                 val decryptedPayload = ChaCha20TransportCipher.decrypt(
                     userId = fromUserId,
                     ciphertext = payload.decodeToString().hexStrToBytes(), // 密文是16进制字符串

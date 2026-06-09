@@ -39,7 +39,7 @@ class OutEncryptInterceptor : ChannelInterceptor {
         val fromUserId: Long = accessor.getFirstNativeHeader("fromUserId")?.toLongOrNull() ?: 0
         val toUserId: Long = accessor.getFirstNativeHeader("toUserId")?.toLongOrNull() ?: 0
         val url = accessor.getFirstNativeHeader("url") ?: ""
-        DarcyLogger.info("$TAG destination: $destination, receipt: $receipt, userId: $fromUserId, url: $url")
+        DarcyLogger.info("$TAG destination: $destination, receipt: $receipt, toUserId: $toUserId, url: $url")
         val payload = message.payload
         DarcyLogger.info("$TAG payload type: ${payload::class.java.simpleName} body: ${(payload as? ByteArray)?.decodeToString()}")
         // 只处理特定的消息目的地
