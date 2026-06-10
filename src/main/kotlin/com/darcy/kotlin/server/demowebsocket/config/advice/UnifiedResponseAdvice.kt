@@ -25,7 +25,7 @@ class UnifiedResponseAdvice : ResponseBodyAdvice<Any?> {
     override fun supports(returnType: MethodParameter, converterType: Class<out HttpMessageConverter<*>>): Boolean {
         // 判断是否需要包装：只对非 ApiResult 类型、非 String 类型的返回值生效
         val needWrap = returnType.method?.returnType?.isAssignableFrom(ResultEntity::class.java) == false
-        DarcyLogger.warn("$TAG Need UnifiedWrap: $needWrap")
+        DarcyLogger.warn("$TAG 是否需要包裹为统一格式: $needWrap")
         return needWrap
     }
 
