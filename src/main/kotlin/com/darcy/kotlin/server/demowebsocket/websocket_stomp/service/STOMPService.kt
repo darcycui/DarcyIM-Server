@@ -38,6 +38,7 @@ class STOMPService @Autowired constructor(
     ) {
         kotlin.runCatching {
             val recipient = privateMessage.receiverName
+            val fromUserName = privateMessage.senderName
             val headers = mapOf(
                 "fromUserId" to fromUserId,
                 "toUserId" to privateMessage.receiverId,
@@ -60,7 +61,7 @@ class STOMPService @Autowired constructor(
                 isRead = false
             )
             DarcyLogger.info("创建消息已读状态: msgId=${savedMessage.msgId}, receiverId=${privateMessage.receiverId}")
-            DarcyLogger.warn("单聊消息 -->$recipient headers=$headers message=$privateMessage")
+            DarcyLogger.warn("单聊消息 $fromUserName-->$recipient headers=$headers message=$privateMessage")
             // Spring STOMP 单播 Unicast
             websocket.convertAndSendToUser(
                 recipient,

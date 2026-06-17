@@ -15,7 +15,7 @@ object TransportKeyManager {
     private lateinit var DHService: DHService
     fun getTransportKey(userId: Long): ByteArray {
         if (userId <= 0) {
-            DarcyLogger.error("用户ID错误: $userId")
+            DarcyLogger.error("$TAG 用户ID错误: $userId 无法获取传输密钥s")
             return byteArrayOf()
         }
         val key = transportKeyMap[userId] ?: run {
@@ -25,12 +25,15 @@ object TransportKeyManager {
             byteArrayOf()
         }
         DarcyLogger.debug("$TAG 获取用户 $userId 的传输密钥: ${key.bytesToHexStr()}")
+        if (key.isEmpty()){
+            DarcyLogger.error("$TAG 用户 $userId 的传输密钥为空")
+        }
         return key
     }
 
     fun setTransportKey(userId: Long, key: ByteArray) {
         if (userId <= 0) {
-            DarcyLogger.error("用户ID错误: $userId")
+            DarcyLogger.error("$TAG 用户ID错误: $userId 无法设置传输密钥")
             return
         }
         transportKeyMap[userId] = key
@@ -39,7 +42,7 @@ object TransportKeyManager {
 
     fun removeTransportKey(userId: Long) {
         if (userId <= 0) {
-            DarcyLogger.error("用户ID错误: $userId")
+            DarcyLogger.error("$TAG 用户ID错误: $userId 无法删除传输密钥")
             return
         }
         transportKeyMap.remove(userId)

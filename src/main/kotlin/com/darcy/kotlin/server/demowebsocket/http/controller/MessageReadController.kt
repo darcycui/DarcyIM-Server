@@ -34,11 +34,17 @@ class MessageReadController @Autowired constructor(
         val msgIds = params.msgIds
         val updatedCount = messageReadStatusService.receiverMarkMessagesAsRead(userId, msgIds)
         val result = messageReadStatusService.receiverGetMessageListReadStatus(userId, msgIds)
+        val headers = mapOf(
+            "fromUserId" to userId,
+            "toUserId" to params.targetId,
+            "url" to "/private"
+        )
         // websocket 发送已读状态
         websocket.convertAndSendToUser(
             params.targetName,
             SEND_PRIVATE_MESSAGE_READ_URL,
-            result.toDTO()
+            result.toDTO(),
+            headers
         )
         return result.toDTO()
     }
