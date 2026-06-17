@@ -62,8 +62,9 @@ class InUserInterceptor @Autowired constructor(
                     // 更新用户的最后活跃时间（即离线时间）
                     userService.updateLastActiveTime(userName)
                     // 删除用户传输密钥
-                    val userId = userService.queryUserByUsername(userName).id
-                    TransportKeyManager.removeTransportKey(userId)
+//                    val userId = userService.queryUserByUsername(userName).id
+//                    TransportKeyManager.removeTransportKey(userId)
+                    // 统计在线人数
                     userCount()
                 }
 
