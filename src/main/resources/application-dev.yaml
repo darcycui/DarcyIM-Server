@@ -43,6 +43,9 @@ spring:
     user:
       name: admin
       password: admin
+  output:
+    ansi:
+      enabled: always  # 控制台输出 ANSI 颜色
 
 logging:
   file:

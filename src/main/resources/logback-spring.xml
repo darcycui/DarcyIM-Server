@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 注册自定义转换器 -->
+    <conversionRule conversionWord="customLevelColor"
+                    converterClass="com.darcy.kotlin.server.demowebsocket.log.CustomLevelColorConverter"/>
+    <!-- 新增：消息颜色转换器 -->
+    <conversionRule conversionWord="coloredMsg"
+                    converterClass="com.darcy.kotlin.server.demowebsocket.log.ColoredMessageConverter"/>
+
+    <!-- 使用自定义转换器的模式：先上色，再输出级别，最后重置 -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{HH:mm:ss.SSS} %customLevelColor [%thread] %cyan(%logger{20}) : %coloredMsg%n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <root level="trace">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
