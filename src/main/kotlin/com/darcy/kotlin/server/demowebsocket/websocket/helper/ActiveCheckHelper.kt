@@ -47,11 +47,11 @@
 //    // 定时任务（需在Spring Boot启动类添加@EnableScheduling）
 //    @Scheduled(fixedRate = INACTIVE_CHECK_INTERVAL) // 每30秒扫描一次
 //    fun checkInactiveConnections() {
-//        DarcyLogger.warn("$TAG 扫描不活跃连接")
+//        logW("$TAG 扫描不活跃连接")
 //        val webSocketServerMap: Map<String, WebSocketServer> = WebSocketServer.getSocketMap()
 //        val now = System.currentTimeMillis()
 //        webSocketServerMap.keys.iterator().forEach { userId ->
-//            DarcyLogger.info("$TAG userId:$userId")
+//            logI("$TAG userId:$userId")
 //            lastActiveTimeMap[userId]?.let {
 //                if (now - it >= INACTIVE_TIMEOUT) {
 //                    webSocketServerMap[userId]?.disconnectUser(userId)

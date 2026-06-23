@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.utils
 
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logE
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -23,7 +24,7 @@ object TimeUtil {
                 continue
             }
         }
-        DarcyLogger.error("无法解析日期时间格式: $dateStr")
+        logE("无法解析日期时间格式: $dateStr")
         return defaultDateTime()
     }
 

@@ -6,6 +6,7 @@ import com.darcy.kotlin.server.demowebsocket.crypto.transport.ITransportCipher
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.ChaCha20TransportCipher
 import com.darcy.kotlin.server.demowebsocket.http.service.UserService
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logD
 import com.darcy.kotlin.server.demowebsocket.utils.TokenUtil
 import com.darcy.kotlin.server.demowebsocket.utils.hexStrToBytes
 import jakarta.servlet.http.HttpServletRequest
@@ -41,7 +42,7 @@ class DecryptRequestBodyAdvice @Autowired constructor(
         // 仅处理标记了 @Encrypted 的方法或类
         val isEncrypted = methodParameter.method?.isAnnotationPresent(Encrypted::class.java) == true
                 || methodParameter.containingClass.isAnnotationPresent(Encrypted::class.java)
-        DarcyLogger.debug("$TAG 是否需要拦截请求: $isEncrypted")
+        logD("$TAG 是否需要拦截请求: $isEncrypted")
         return isEncrypted
     }
 
@@ -51,7 +52,7 @@ class DecryptRequestBodyAdvice @Autowired constructor(
         targetType: Type,
         converterType: Class<out HttpMessageConverter<*>>
     ): HttpInputMessage {
-        DarcyLogger.debug("$TAG 拦截请求...")
+        logD("$TAG 拦截请求...")
         val servletRequest: HttpServletRequest = when (inputMessage) {
             is ServletServerHttpRequest -> inputMessage.servletRequest
             else -> {
@@ -60,7 +61,7 @@ class DecryptRequestBodyAdvice @Autowired constructor(
             }
         }
         if (EncryptResponseBodyAdvice.noNeedEncrypt(servletRequest.requestURI)) {
-            DarcyLogger.debug("$TAG 请求未加密，不进行解密")
+            logD("$TAG 请求未加密，不进行解密")
             return inputMessage
         }
         val token = servletRequest.getHeader(TokenUtil.TOKEN_HEADER)
@@ -68,14 +69,14 @@ class DecryptRequestBodyAdvice @Autowired constructor(
         val userId = userService.queryUserByUsername(username).id
         // 读取原始请求体并解密
         val originalBody = inputMessage.body.readAllBytes()
-        DarcyLogger.debug("$TAG 原始请求body: ${originalBody.decodeToString()}")
+        logD("$TAG 原始请求body: ${originalBody.decodeToString()}")
         val aad = "${servletRequest.method}:${servletRequest.requestURL}"
         val decryptedBody = transformCipher.decrypt(
             userId = userId,
             ciphertext = originalBody.decodeToString().hexStrToBytes(), // 密文是16进制字符串
             aad = aad.toByteArray(StandardCharsets.UTF_8),
         )
-        DarcyLogger.debug("$TAG 解密后请求body: ${String(decryptedBody)}")
+        logD("$TAG 解密后请求body: ${String(decryptedBody)}")
 
         // 返回新的 HttpInputMessage，包含解密后的字节流
         return object : HttpInputMessage {

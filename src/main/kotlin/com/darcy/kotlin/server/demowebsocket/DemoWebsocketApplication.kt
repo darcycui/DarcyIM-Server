@@ -1,6 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket
 
-import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -11,9 +11,9 @@ class DemoWebsocketApplication
 
 fun main(args: Array<String>) {
     runApplication<DemoWebsocketApplication>(*args)
-    DarcyLogger.trace("DarcyLogger trace")
-    DarcyLogger.info("DarcyLogger info")
-    DarcyLogger.debug("DarcyLogger debug")
-    DarcyLogger.warn("DarcyLogger warn")
-    DarcyLogger.error("DarcyLogger error")
+    logD("DarcyLogger trace")
+    logI("DarcyLogger info")
+    logD("DarcyLogger debug")
+    logW("DarcyLogger warn")
+    logE("DarcyLogger error")
 }

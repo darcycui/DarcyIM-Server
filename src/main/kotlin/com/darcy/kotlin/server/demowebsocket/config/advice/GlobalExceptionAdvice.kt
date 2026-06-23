@@ -5,6 +5,7 @@ import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
 import com.darcy.kotlin.server.demowebsocket.exception.BaseException
 import com.darcy.kotlin.server.demowebsocket.exception.code600.ParamsException
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logE
 import jakarta.annotation.Priority
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -25,7 +26,7 @@ class GlobalExceptionAdvice {
     // 处理自定义 BaseException 异常
     @ExceptionHandler(BaseException::class)
     fun handleBaseException(ex: BaseException): ResultEntity<*> {
-        DarcyLogger.error("$TAG handleBaseException:${ex::class.simpleName}")
+        logE("$TAG handleBaseException:${ex::class.simpleName}")
         ex.printStackTrace()
         return ResultEntity.error(ex)
     }
@@ -33,7 +34,7 @@ class GlobalExceptionAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(ex: MethodArgumentNotValidException): ResultEntity<*> {
-        DarcyLogger.error("$TAG handleValidationException:${ex::class.simpleName}")
+        logE("$TAG handleValidationException:${ex::class.simpleName}")
         ex.printStackTrace()
         val errors = ex.bindingResult?.fieldErrors?.map {
             mapOf(it.field to (it.defaultMessage ?: "参数不合法"))
@@ -49,7 +50,7 @@ class GlobalExceptionAdvice {
     // 处理其他异常 Exception
     @ExceptionHandler(Exception::class)
     fun handleException(ex: Exception): ResultEntity<*> {
-        DarcyLogger.error("$TAG handleException:${ex::class.simpleName}")
+        logE("$TAG handleException:${ex::class.simpleName}")
         ex.printStackTrace()
         return ResultEntity.error(BaseException.UNKNOWN_EXCEPTION.apply {
             exceptionMessage += ":${ex::class.simpleName} :${ex.message}"
@@ -59,7 +60,7 @@ class GlobalExceptionAdvice {
     // 处理 Throwable（最顶层的异常）
     @ExceptionHandler(Throwable::class)
     fun handleThrowable(ex: Throwable): ResultEntity<*> {
-        DarcyLogger.error("$TAG handleThrowable: ${ex::class.simpleName} - ${ex.message}")
+        logE("$TAG handleThrowable: ${ex::class.simpleName} - ${ex.message}")
         ex.printStackTrace()
         val result = ResultEntity.error(BaseException.UNKNOWN_THROWABLE.apply {
             exceptionMessage += ":${ex::class.simpleName} :${ex.message}"

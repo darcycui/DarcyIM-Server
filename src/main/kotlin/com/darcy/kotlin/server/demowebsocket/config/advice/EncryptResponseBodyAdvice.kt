@@ -6,6 +6,8 @@ import com.darcy.kotlin.server.demowebsocket.crypto.transport.ITransportCipher
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.ChaCha20TransportCipher
 import com.darcy.kotlin.server.demowebsocket.http.service.UserService
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logD
+import com.darcy.kotlin.server.demowebsocket.log.logW
 import com.darcy.kotlin.server.demowebsocket.utils.JsonUtil
 import com.darcy.kotlin.server.demowebsocket.utils.TokenUtil
 import com.darcy.kotlin.server.demowebsocket.utils.bytesToHexStr
@@ -53,7 +55,7 @@ class EncryptResponseBodyAdvice @Autowired constructor(
         // 2. 检查是否是异常处理器（可选）
         val isExceptionHandler = returnType.method?.isAnnotationPresent(ExceptionHandler::class.java) == true
         val needEncrypt = hasEncryptedAnnotation || isExceptionHandler
-        DarcyLogger.debug("$TAG 是否需要拦截响应: $needEncrypt")
+        logD("$TAG 是否需要拦截响应: $needEncrypt")
         return needEncrypt
     }
 
@@ -65,14 +67,14 @@ class EncryptResponseBodyAdvice @Autowired constructor(
         request: ServerHttpRequest,
         response: ServerHttpResponse
     ): Any? {
-        DarcyLogger.debug("$TAG 拦截响应...")
+        logD("$TAG 拦截响应...")
 
         if (body == null) {
-            DarcyLogger.warn("$TAG 响应body为null")
+            logW("$TAG 响应body为null")
             return null
         }
         if (noNeedEncrypt(request.uri.path)) {
-            DarcyLogger.warn("$TAG 响应无需加密")
+            logW("$TAG 响应无需加密")
             return body
         }
         val realRequest = (request as ServletServerHttpRequest)
@@ -81,7 +83,7 @@ class EncryptResponseBodyAdvice @Autowired constructor(
         val userId = userService.queryUserByUsername(username).id
         // 将响应对象转为 JSON 字符串
         val json = JsonUtil.toJson(body)
-        DarcyLogger.debug("$TAG 原始响应body: $body")
+        logD("$TAG 原始响应body: $body")
 
         // 加密后返回加密字符串
         val ciphertext = transformCipher.encrypt(
@@ -89,7 +91,7 @@ class EncryptResponseBodyAdvice @Autowired constructor(
             plaintext = json.toByteArray(),
             aad = "${realRequest.method}:${realRequest.uri.toString()}".toByteArray()
         ).bytesToHexStr()
-        DarcyLogger.debug("$TAG 加密后响应body: $ciphertext")
+        logD("$TAG 加密后响应body: $ciphertext")
         return ciphertext
     }
 }

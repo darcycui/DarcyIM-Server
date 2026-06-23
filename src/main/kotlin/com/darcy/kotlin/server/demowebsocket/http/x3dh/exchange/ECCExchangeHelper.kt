@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.http.x3dh.exchange
 
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logI
 import com.darcy.kotlin.server.demowebsocket.utils.bytesToHexStr
 import com.darcy.kotlin.server.demowebsocket.utils.keyToString
 import java.security.*
@@ -23,13 +24,13 @@ object ECCExchangeHelper {
 
     fun getSharedSecret(privateKey: PrivateKey?, publicKey: PublicKey?): ByteArray {
         try {
-            DarcyLogger.info("getSharedSecret: privateKey=${privateKey?.keyToString()}")
-            DarcyLogger.info("getSharedSecret: publicKey=${publicKey?.keyToString()}")
+            logI("getSharedSecret: privateKey=${privateKey?.keyToString()}")
+            logI("getSharedSecret: publicKey=${publicKey?.keyToString()}")
             val keyAgreement = KeyAgreement.getInstance(ALGORITHM)
             keyAgreement.init(privateKey)
             keyAgreement.doPhase(publicKey, true)
             val sharedKey =  keyAgreement.generateSecret()
-            DarcyLogger.info("getSharedSecret: sharedKey=${sharedKey.bytesToHexStr()}")
+            logI("getSharedSecret: sharedKey=${sharedKey.bytesToHexStr()}")
             return sharedKey
         } catch (e: NoSuchAlgorithmException) {
             throw RuntimeException(e)

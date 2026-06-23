@@ -5,6 +5,8 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.repository.UserRepository
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logE
+import com.darcy.kotlin.server.demowebsocket.log.logI
 import com.darcy.kotlin.server.demowebsocket.utils.PasswordUtil
 import com.darcy.kotlin.server.demowebsocket.utils.UUIdGenerator
 import org.springframework.beans.factory.annotation.Autowired
@@ -86,9 +88,9 @@ class UserService @Autowired constructor(
             userRepository.deleteById(userId)
             "删除用户成功"
         }.onSuccess {
-            DarcyLogger.info("删除用户成功: userId=$userId")
+            logI("删除用户成功: userId=$userId")
         }.onFailure {
-            DarcyLogger.error("删除用户失败: userId=$userId")
+            logE("删除用户失败: userId=$userId")
             it.printStackTrace()
         }.getOrElse { "删除用户失败" }
     }
@@ -106,7 +108,7 @@ class UserService @Autowired constructor(
             ?: throw UserException.USER_NOT_EXIST
         user.lastActiveTime = LocalDateTime.now()
         userRepository.save(user)
-        DarcyLogger.info("更新用户最后活跃时间: username=$username, time=${user.lastActiveTime}")
+        logI("更新用户最后活跃时间: username=$username, time=${user.lastActiveTime}")
     }
 
     fun queryLastActiveTime(userId: Long): LocalDateTime? {

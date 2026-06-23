@@ -1,6 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.handshake
 
-import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.*
 import com.darcy.kotlin.server.demowebsocket.utils.TokenUtil
 import org.springframework.http.server.ServerHttpRequest
 import org.springframework.http.server.ServerHttpResponse
@@ -23,7 +23,7 @@ class StompHandshakeInterceptor : HandshakeInterceptor {
     ): Boolean {
         try {
             val uri = request.uri
-            DarcyLogger.info("WebSocket 握手请求: ${uri.path}")
+            logI("WebSocket 握手请求: ${uri.path}")
 
             val headers = request.headers
 
@@ -33,19 +33,19 @@ class StompHandshakeInterceptor : HandshakeInterceptor {
 
             val sessionId = UUID.randomUUID().toString()
             if (authHeader.isBlank()) {
-                DarcyLogger.warn("WebSocket 握手缺少 Authorization header")
+                logW("WebSocket 握手缺少 Authorization header")
                 attributes["userName"] = "username:$sessionId"
             } else {
-                DarcyLogger.info("WebSocket 握手 Authorization: $authHeader")
+                logI("WebSocket 握手 Authorization: $authHeader")
                 attributes["userName"] = authHeader
             }
 
             attributes["sessionId"] = sessionId
-            DarcyLogger.info("WebSocket 握手成功，sessionId: $sessionId")
+            logI("WebSocket 握手成功，sessionId: $sessionId")
 
             return true
         } catch (e: Exception) {
-            DarcyLogger.error("WebSocket 握手失败: ${e.message}", e)
+            logE("WebSocket 握手失败: ${e.message} sessionId=${e.message}")
             return false
         }
     }
@@ -57,9 +57,9 @@ class StompHandshakeInterceptor : HandshakeInterceptor {
         exception: Exception?
     ) {
         if (exception != null) {
-            DarcyLogger.error("WebSocket 握手后异常: ${exception.message}", exception)
+            logE("WebSocket 握手后异常: ${exception.message} sessionId=${exception.message}", )
         } else {
-            DarcyLogger.debug("WebSocket 握手完成")
+            logD("WebSocket 握手完成")
         }
     }
 }

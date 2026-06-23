@@ -1,6 +1,9 @@
 package com.darcy.kotlin.server.demowebsocket.http.repository
 
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logE
+import com.darcy.kotlin.server.demowebsocket.log.logI
+import com.darcy.kotlin.server.demowebsocket.log.logW
 import org.springframework.stereotype.Repository
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
@@ -20,10 +23,10 @@ class FileRepository {
             // 保存文件到本地
             val saveFile = File(filePath)
             if (saveFile.exists()) {
-                DarcyLogger.warn("文件已存在 无需保存！ $fileName ")
+                logW("文件已存在 无需保存！ $fileName ")
                 return saveFile
             }
-            DarcyLogger.info("文件保存成功: $fileName")
+            logI("文件保存成功: $fileName")
             if (!saveFile.parentFile.exists()) {
                 saveFile.parentFile.mkdirs()
             }
@@ -31,7 +34,7 @@ class FileRepository {
             return saveFile
         } catch (e: IOException) {
             e.printStackTrace()
-            DarcyLogger.error("文件保存失败: $fileName")
+            logE("文件保存失败: $fileName")
         }
         return null
     }

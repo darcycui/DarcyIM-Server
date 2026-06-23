@@ -5,6 +5,7 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.dh.DHKeyExchange
 import com.darcy.kotlin.server.demowebsocket.http.repository.DHKeyExchangeRepository
 import com.darcy.kotlin.server.demowebsocket.http.x3dh.exchange.ECCExchangeHelper
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logI
 import com.darcy.kotlin.server.demowebsocket.utils.bytesToHexStr
 import com.darcy.kotlin.server.demowebsocket.utils.hexStrToBytes
 import com.darcy.kotlin.server.demowebsocket.utils.keyToString
@@ -23,9 +24,9 @@ class DHService @Autowired constructor(
     fun dhKeyExchange(userId: Long, publicKey: String): DHKeyExchange {
         val user = userService.queryUserById(userId)
         val ephemeralKeyPair: KeyPair = ECCExchangeHelper.generateKeyPair()
-        DarcyLogger.info("dhKeyExchange: userId=$userId")
-        DarcyLogger.info("dhKeyExchange: 临时私钥=${ephemeralKeyPair.private.keyToString()}")
-        DarcyLogger.info("dhKeyExchange: 临时公钥=${ephemeralKeyPair.public.keyToString()}")
+        logI("dhKeyExchange: userId=$userId")
+        logI("dhKeyExchange: 临时私钥=${ephemeralKeyPair.private.keyToString()}")
+        logI("dhKeyExchange: 临时公钥=${ephemeralKeyPair.public.keyToString()}")
         val sharedSecret = ECCExchangeHelper.getSharedSecret(
             ephemeralKeyPair.private,
             publicKey.hexStrToBytes().toPublicKey()

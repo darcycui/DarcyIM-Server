@@ -3,6 +3,8 @@ package com.darcy.kotlin.server.demowebsocket.http.service
 import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.repository.UserRepository
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logE
+import com.darcy.kotlin.server.demowebsocket.log.logI
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
@@ -21,15 +23,15 @@ class CustomUserDetailsService @Autowired constructor(
     // 重写 web-security 认证方法
     override fun loadUserByUsername(username: String?): UserDetails {
         if (username == null) {
-            DarcyLogger.error("用户名不能为空")
+            logE("用户名不能为空")
             throw UserException.USER_NAME_PASSWORD_EMPTY
         }
         val user = userRepository.findByUsername(username)
         if (user == null) {
-            DarcyLogger.error("用户不存在:${username}")
+            logE("用户不存在:${username}")
             throw UserException.USER_NOT_EXIST
         }
-        DarcyLogger.info("用户存在: ${user.username}")
+        logI("用户存在: ${user.username}")
         user.roles = "USER"
         // 创建 web-security 认证用户 UserDetails
         return User.builder().username(user.username)

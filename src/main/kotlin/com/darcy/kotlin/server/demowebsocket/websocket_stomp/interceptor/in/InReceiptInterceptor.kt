@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`
 
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logI
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Lazy
@@ -35,28 +36,28 @@ class InReceiptInterceptor : ChannelInterceptor {
             StompCommand.SEND -> {
                 val receipt = accessor.receipt
                 if (StringUtils.hasText(receipt)) {
-                    DarcyLogger.info("$TAG 收到带确认帧的消息: command=${accessor.command}, receipt=$receipt, destination=${accessor.destination}")
+                    logI("$TAG 收到带确认帧的消息: command=${accessor.command}, receipt=$receipt, destination=${accessor.destination}")
                 }
             }
 
             StompCommand.SUBSCRIBE -> {
                 val receipt = accessor.receipt
                 if (StringUtils.hasText(receipt)) {
-                    DarcyLogger.info("$TAG 收到带确认帧的订阅: command=${accessor.command}, receipt=$receipt, destination=${accessor.destination}")
+                    logI("$TAG 收到带确认帧的订阅: command=${accessor.command}, receipt=$receipt, destination=${accessor.destination}")
                 }
             }
 
             StompCommand.UNSUBSCRIBE -> {
                 val receipt = accessor.receipt
                 if (StringUtils.hasText(receipt)) {
-                    DarcyLogger.info("$TAG 收到带确认帧的取消订阅: command=${accessor.command}, receipt=$receipt")
+                    logI("$TAG 收到带确认帧的取消订阅: command=${accessor.command}, receipt=$receipt")
                 }
             }
 
             StompCommand.DISCONNECT -> {
                 val receipt = accessor.receipt
                 if (StringUtils.hasText(receipt)) {
-                    DarcyLogger.info("$TAG 收到带确认帧的断开连接: command=${accessor.command}, receipt=$receipt")
+                    logI("$TAG 收到带确认帧的断开连接: command=${accessor.command}, receipt=$receipt")
                 }
             }
 
@@ -76,15 +77,15 @@ class InReceiptInterceptor : ChannelInterceptor {
 
         if (StringUtils.hasText(receipt)) {
             if (sent) {
-                DarcyLogger.info("$TAG 消息成功处理，准备发送确认帧: receipt=$receipt")
+                logI("$TAG 消息成功处理，准备发送确认帧: receipt=$receipt")
                 // 这里可以触发业务逻辑，如记录日志到数据库
                 // 这里手动发送 确认帧
                 sendReceiptIfNeeded(message)
             } else if (ex != null) {
-                DarcyLogger.info("$TAG 消息处理失败: receipt=$receipt, error=${ex.message}")
+                logI("$TAG 消息处理失败: receipt=$receipt, error=${ex.message}")
             }
         } else {
-            DarcyLogger.info("$TAG 确认帧未指定，忽略: command=${accessor.command}, destination=${accessor.destination}")
+            logI("$TAG 确认帧未指定，忽略: command=${accessor.command}, destination=${accessor.destination}")
         }
     }
 
@@ -110,7 +111,7 @@ class InReceiptInterceptor : ChannelInterceptor {
         if (StringUtils.hasText(receipt)) {
             sendReceiptFrame(receipt, accessor)
         } else {
-            DarcyLogger.info("$TAG 确认帧 null")
+            logI("$TAG 确认帧 null")
         }
     }
 
@@ -120,7 +121,7 @@ class InReceiptInterceptor : ChannelInterceptor {
     private fun sendReceiptFrame(receiptId: String, originalAccessor: StompHeaderAccessor) {
         try {
             val sessionId = originalAccessor.sessionId
-            DarcyLogger.info("$TAG 开始发送确认帧: receipt-id=$receiptId, sessionId=$sessionId")
+            logI("$TAG 开始发送确认帧: receipt-id=$receiptId, sessionId=$sessionId")
             // 创建 确认帧的 HeaderAccessor
             val receiptAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT)
             receiptAccessor.receiptId = receiptId
@@ -138,18 +139,18 @@ class InReceiptInterceptor : ChannelInterceptor {
             )
             // 发送到客户端输出通道
             clientOutboundChannel.send(receiptMessage)
-            DarcyLogger.info("$TAG 确认帧已发送: receipt-id=$receiptId, sessionId=$sessionId 帧头: ${receiptAccessor.toNativeHeaderMap()}")
+            logI("$TAG 确认帧已发送: receipt-id=$receiptId, sessionId=$sessionId 帧头: ${receiptAccessor.toNativeHeaderMap()}")
         } catch (e: IllegalStateException) {
             // 会话已关闭，忽略此异常
             if (e.message?.contains("Cannot send a message when session is closed") == true) {
-                DarcyLogger.info("$TAG 会话已关闭，无法发送确认帧: receipt-id=$receiptId, error=${e.message}")
+                logI("$TAG 会话已关闭，无法发送确认帧: receipt-id=$receiptId, error=${e.message}")
                 return
             } else {
-                DarcyLogger.info("$TAG 发送确认帧失败-1: ${e.message}")
+                logI("$TAG 发送确认帧失败-1: ${e.message}")
                 e.printStackTrace()
             }
         } catch (e: Exception) {
-            DarcyLogger.info("$TAG 发送确认帧失败-2: ${e.message}")
+            logI("$TAG 发送确认帧失败-2: ${e.message}")
             e.printStackTrace()
         }
     }

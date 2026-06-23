@@ -2,6 +2,8 @@ package com.darcy.kotlin.server.demowebsocket.crypto.transport
 
 import com.darcy.kotlin.server.demowebsocket.http.service.DHService
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logD
+import com.darcy.kotlin.server.demowebsocket.log.logE
 import com.darcy.kotlin.server.demowebsocket.utils.bytesToHexStr
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -15,7 +17,7 @@ object TransportKeyManager {
     private lateinit var DHService: DHService
     fun getTransportKey(userId: Long): ByteArray {
         if (userId <= 0) {
-            DarcyLogger.error("$TAG 用户ID错误: $userId 无法获取传输密钥s")
+            logE("$TAG 用户ID错误: $userId 无法获取传输密钥s")
             return byteArrayOf()
         }
         val key = transportKeyMap[userId] ?: run {
@@ -24,25 +26,25 @@ object TransportKeyManager {
 //            existKey
             byteArrayOf()
         }
-        DarcyLogger.debug("$TAG 获取用户 $userId 的传输密钥: ${key.bytesToHexStr()}")
+        logD("$TAG 获取用户 $userId 的传输密钥: ${key.bytesToHexStr()}")
         if (key.isEmpty()){
-            DarcyLogger.error("$TAG 用户 $userId 的传输密钥为空")
+            logE("$TAG 用户 $userId 的传输密钥为空")
         }
         return key
     }
 
     fun setTransportKey(userId: Long, key: ByteArray) {
         if (userId <= 0) {
-            DarcyLogger.error("$TAG 用户ID错误: $userId 无法设置传输密钥")
+            logE("$TAG 用户ID错误: $userId 无法设置传输密钥")
             return
         }
         transportKeyMap[userId] = key
-        DarcyLogger.debug("$TAG 设置用户 $userId 的传输密钥: ${key.bytesToHexStr()}")
+        logD("$TAG 设置用户 $userId 的传输密钥: ${key.bytesToHexStr()}")
     }
 
     fun removeTransportKey(userId: Long) {
         if (userId <= 0) {
-            DarcyLogger.error("$TAG 用户ID错误: $userId 无法删除传输密钥")
+            logE("$TAG 用户ID错误: $userId 无法删除传输密钥")
             return
         }
         transportKeyMap.remove(userId)

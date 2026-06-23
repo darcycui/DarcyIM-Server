@@ -65,7 +65,7 @@ open class ResultEntity<T>() {
             this,
 //            JSONWriter.Feature.ReferenceDetection
         ).also {
-//            DarcyLogger.warn(it)
+//            logW(it)
         }
     }
 
@@ -74,7 +74,7 @@ open class ResultEntity<T>() {
             this.result,
 //            JSONWriter.Feature.ReferenceDetection
         ).also {
-//            DarcyLogger.warn(it)
+//            logW(it)
         }
     }
 

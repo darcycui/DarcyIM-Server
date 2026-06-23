@@ -7,6 +7,7 @@ import com.darcy.kotlin.server.demowebsocket.domain.dto.user.toDTO
 import com.darcy.kotlin.server.demowebsocket.domain.table.user.User
 import com.darcy.kotlin.server.demowebsocket.http.service.RegisterService
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logI
 import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RestController
@@ -19,7 +20,7 @@ class RegisterController @Autowired constructor(
     override fun register(params: RegisterRequestDTO): UserDTO {
 
         val createdAt = TimeUtil.getCurrentTimeDate()
-        DarcyLogger.info("-->createdAt: $createdAt")
+        logI("-->createdAt: $createdAt")
 
         val userEntity = User(
             username = params.username,

@@ -2,6 +2,8 @@ package com.darcy.kotlin.server.demowebsocket.crypto.transport.impl
 
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.ITransportCipher
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logD
+import com.darcy.kotlin.server.demowebsocket.log.logE
 import com.darcy.kotlin.server.demowebsocket.utils.hexStrToBytes
 import java.security.SecureRandom
 import javax.crypto.Cipher
@@ -25,11 +27,11 @@ object ChaCha20TransportCipher : ITransportCipher {
         aad: ByteArray
     ): ByteArray {
         return kotlin.runCatching {
-            DarcyLogger.debug("$TAG 加密...")
-            DarcyLogger.debug("$TAG 明文: ${plaintext.decodeToString()}")
-            DarcyLogger.debug("$TAG 加密Key: ${key.toHexString()}")
-            DarcyLogger.debug("$TAG 加密AAD: ${aad.toHexString()}")
-            DarcyLogger.debug("$TAG 加密Nonce: ${nonce.toHexString()}")
+            logD("$TAG 加密...")
+            logD("$TAG 明文: ${plaintext.decodeToString()}")
+            logD("$TAG 加密Key: ${key.toHexString()}")
+            logD("$TAG 加密AAD: ${aad.toHexString()}")
+            logD("$TAG 加密Nonce: ${nonce.toHexString()}")
             // 2. 初始化 Cipher
             val cipher = Cipher.getInstance(ALGORITHM)
             val keySpec = SecretKeySpec(key, ALGORITHM)
@@ -39,16 +41,16 @@ object ChaCha20TransportCipher : ITransportCipher {
 
             // 3. 加密数据
             val encryptedData = cipher.doFinal(plaintext)
-            DarcyLogger.debug("$TAG 加密后data: ${encryptedData.toHexString()}")
+            logD("$TAG 加密后data: ${encryptedData.toHexString()}")
 
             // 4. 将 Nonce 附加到密文前面
             // 格式: [Nonce (12字节)] + [Encrypted Data]
             // 解密时需要用到这个 Nonce
             nonce + encryptedData
         }.onSuccess {
-            DarcyLogger.debug("$TAG 加密成功.")
+            logD("$TAG 加密成功.")
         }.onFailure {
-            DarcyLogger.error("$TAG 加密失败: ${it.message}")
+            logE("$TAG 加密失败: ${it.message}")
             it.printStackTrace()
         }.getOrElse {
             byteArrayOf()
@@ -63,16 +65,16 @@ object ChaCha20TransportCipher : ITransportCipher {
         aad: ByteArray
     ): ByteArray {
         return kotlin.runCatching {
-            DarcyLogger.debug("$TAG 解密...")
-            DarcyLogger.debug("$TAG 密文: ${ciphertext.toHexString()} 长度：${ciphertext.toHexString().length}")
-            DarcyLogger.debug("$TAG 解密Key: ${key.toHexString()}")
-            DarcyLogger.debug("$TAG 解密AAD: ${aad.toHexString()}")
+            logD("$TAG 解密...")
+            logD("$TAG 密文: ${ciphertext.toHexString()} 长度：${ciphertext.toHexString().length}")
+            logD("$TAG 解密Key: ${key.toHexString()}")
+            logD("$TAG 解密AAD: ${aad.toHexString()}")
             // 1. 检查密文长度是否合法
             require(ciphertext.size >= NONCE_SIZE_BYTES) { "Ciphertext too short to contain Nonce." }
 
             // 2. 提取 Nonce 和实际的加密数据
             val nonce = ciphertext.copyOfRange(0, NONCE_SIZE_BYTES)
-            DarcyLogger.debug("$TAG 解密Nonce: ${nonce.toHexString()}")
+            logD("$TAG 解密Nonce: ${nonce.toHexString()}")
             val encryptedData = ciphertext.copyOfRange(NONCE_SIZE_BYTES, ciphertext.size)
 
             // 3. 初始化 Cipher
@@ -84,12 +86,12 @@ object ChaCha20TransportCipher : ITransportCipher {
 
             // 4. 解密数据
             val data = cipher.doFinal(encryptedData)
-            DarcyLogger.debug("$TAG 解密后data: ${data.decodeToString()}")
+            logD("$TAG 解密后data: ${data.decodeToString()}")
             data
         }.onSuccess {
-            DarcyLogger.debug("$TAG 解密成功.")
+            logD("$TAG 解密成功.")
         }.onFailure {
-            DarcyLogger.error("$TAG 解密失败: ${it.message}")
+            logE("$TAG 解密失败: ${it.message}")
             it.printStackTrace()
         }.getOrElse {
             byteArrayOf()

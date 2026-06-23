@@ -38,9 +38,9 @@
 //     */
 //    @Bean
 //    fun tomcatContextCustomizer(): TomcatContextCustomizer {
-//        DarcyLogger.info("init")
+//        logI("init")
 //        return TomcatContextCustomizer { context ->
-//            DarcyLogger.info("init   customize")
+//            logI("init   customize")
 //            context.addServletContainerInitializer(WsSci(), null)
 //        }
 //    }

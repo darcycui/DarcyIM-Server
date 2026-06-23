@@ -51,20 +51,20 @@
 //        SOCKET_MAP[userId] = this
 //        this.userId = userId
 //        activeCheckHelper.updateLastActiveTime(userId)
-//        DarcyLogger.info("用户${session.id} $userId 连接成功, 当前连接总人数为${SOCKET_MAP.size}")
+//        logI("用户${session.id} $userId 连接成功, 当前连接总人数为${SOCKET_MAP.size}")
 //    }
 //
 //    @OnClose
 //    fun close(session: Session, @PathParam("userId") userId: String) {
 //        SOCKET_MAP.remove(userId)
 //        activeCheckHelper.removeLastActiveTime(userId)
-//        DarcyLogger.info("用户${session.id} $userId 断开连接, 当前连接总人数为${SOCKET_MAP.size}")
+//        logI("用户${session.id} $userId 断开连接, 当前连接总人数为${SOCKET_MAP.size}")
 //    }
 //
 //    @OnMessage
 //    fun onMessage(message: String, session: Session) {
 //        try {
-//            DarcyLogger.info("收到用户${session.id} $userId 的消息:$message")
+//            logI("收到用户${session.id} $userId 的消息:$message")
 //            activeCheckHelper.updateLastActiveTime(userId ?: "")
 //            if (message == "ping") {
 //                SendHelper.sendPong(session)
@@ -74,12 +74,12 @@
 //            val chatEntity = JSONObject.parseObject(message, StrChatEntity::class.java)
 //            val socketServer = SOCKET_MAP[chatEntity.to]
 //            if (socketServer == null) {
-//                DarcyLogger.info("用户${chatEntity.to}不在线")
+//                logI("用户${chatEntity.to}不在线")
 //                return
 //            }
 //            SendHelper.sendToPersonStr(message, socketServer.session)
 //        } catch (e: Exception) {
-//            DarcyLogger.info("用户${session.id} $userId 发送的消息格式有误")
+//            logI("用户${session.id} $userId 发送的消息格式有误")
 //            e.printStackTrace()
 //            disconnectUser(session.id)
 //        }
@@ -87,14 +87,14 @@
 //
 //    @OnError
 //    fun onError(session: Session, error: Throwable) {
-//        DarcyLogger.info("用户${session.id} $userId 发生错误")
+//        logI("用户${session.id} $userId 发生错误")
 //        error.printStackTrace()
 //    }
 //
 //    // 添加主动断开方法
 //    fun disconnectUser(userId: String) {
 //        SOCKET_MAP[userId]?.let {
-//            DarcyLogger.info("主动断开用户 $userId ${session?.id} 当前连接总人数为${SOCKET_MAP.size}")
+//            logI("主动断开用户 $userId ${session?.id} 当前连接总人数为${SOCKET_MAP.size}")
 //            it.session?.close()
 //            SOCKET_MAP.remove(userId)
 //            activeCheckHelper.removeLastActiveTime(userId)

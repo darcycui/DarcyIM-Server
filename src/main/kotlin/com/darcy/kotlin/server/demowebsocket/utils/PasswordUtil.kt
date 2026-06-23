@@ -1,6 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.utils
 
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logW
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
@@ -12,9 +13,9 @@ class PasswordUtil() {
         if (rawPassword.isEmpty()) {
             return ""
         }
-        DarcyLogger.warn("original password: $rawPassword")
+        logW("original password: $rawPassword")
         return passwordEncoder.encode(rawPassword).also {
-            DarcyLogger.warn("encoded password: $it")
+            logW("encoded password: $it")
         }
     }
 

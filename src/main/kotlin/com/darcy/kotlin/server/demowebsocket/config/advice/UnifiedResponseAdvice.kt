@@ -3,6 +3,7 @@ package com.darcy.kotlin.server.demowebsocket.config.advice
 import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.domain.ResultEntity
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logW
 import jakarta.annotation.Priority
 import org.springframework.core.MethodParameter
 import org.springframework.core.annotation.Order
@@ -25,7 +26,7 @@ class UnifiedResponseAdvice : ResponseBodyAdvice<Any?> {
     override fun supports(returnType: MethodParameter, converterType: Class<out HttpMessageConverter<*>>): Boolean {
         // 判断是否需要包装：只对非 ApiResult 类型、非 String 类型的返回值生效
         val needWrap = returnType.method?.returnType?.isAssignableFrom(ResultEntity::class.java) == false
-        DarcyLogger.warn("$TAG 是否需要包裹为统一格式: $needWrap")
+        logW("$TAG 是否需要包裹为统一格式: $needWrap")
         return needWrap
     }
 
@@ -39,11 +40,11 @@ class UnifiedResponseAdvice : ResponseBodyAdvice<Any?> {
     ): Any? {
         // 如果 body 已经是 ApiResult，则直接返回（避免二次包装）
         if (body is ResultEntity<*>) {
-            DarcyLogger.warn("$TAG body is ResultEntity 直接返回")
+            logW("$TAG body is ResultEntity 直接返回")
             return body
         }
         // 包装为统一格式
-        DarcyLogger.warn("$TAG body is ${body?.javaClass?.simpleName} 包装为统一格式 ResultEntity")
+        logW("$TAG body is ${body?.javaClass?.simpleName} 包装为统一格式 ResultEntity")
         return ResultEntity.success(body)
     }
 }

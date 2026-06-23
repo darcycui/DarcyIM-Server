@@ -3,6 +3,8 @@ package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.ChaCha20TransportCipher
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logI
+import com.darcy.kotlin.server.demowebsocket.log.logW
 import com.darcy.kotlin.server.demowebsocket.utils.JsonUtil
 import com.darcy.kotlin.server.demowebsocket.utils.hexStrToBytes
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.config.StompWebsocketConfig
@@ -32,11 +34,11 @@ class InDecryptInterceptor : ChannelInterceptor {
      *
      */
     override fun preSend(message: Message<*>, channel: MessageChannel): Message<*>? {
-        DarcyLogger.info("$TAG 拦截器 preSend")
+        logI("$TAG 拦截器 preSend")
         val accessor = MessageHeaderAccessor.getAccessor(
             message, StompHeaderAccessor::class.java
         ) ?: run {
-            DarcyLogger.warn("$TAG 拦截器 preSend 获取消息头失败")
+            logW("$TAG 拦截器 preSend 获取消息头失败")
             return message
         }
         val destination = accessor.destination
@@ -44,14 +46,14 @@ class InDecryptInterceptor : ChannelInterceptor {
         val fromUserId: Long = accessor.getFirstNativeHeader("fromUserId")?.toLongOrNull() ?: 0
         val toUserId: Long = accessor.getFirstNativeHeader("toUserId")?.toLongOrNull() ?: 0
         val url = accessor.getFirstNativeHeader("url") ?: ""
-        DarcyLogger.info("$TAG destination: $destination, receipt: $receipt, fromUserId: $fromUserId, url: $url")
+        logI("$TAG destination: $destination, receipt: $receipt, fromUserId: $fromUserId, url: $url")
         // 只处理特定的消息目的地
         val isClientMessage = destination?.startsWith(StompWebsocketConfig.CLIENT_SEND_MESSAGE_PREFIX) == true
         if (isClientMessage) {
             val payload = message.payload
-            DarcyLogger.warn("$TAG 入站消息（客户端发送到服务器）payload type: ${payload::class.java.simpleName}")
+            logW("$TAG 入站消息（客户端发送到服务器）payload type: ${payload::class.java.simpleName}")
             if (payload is ByteArray) {
-                DarcyLogger.info("$TAG 需要解密 fromUserId=$fromUserId")
+                logI("$TAG 需要解密 fromUserId=$fromUserId")
                 val decryptedPayload = ChaCha20TransportCipher.decrypt(
                     userId = fromUserId,
                     ciphertext = payload.decodeToString().hexStrToBytes(), // 密文是16进制字符串
@@ -67,7 +69,7 @@ class InDecryptInterceptor : ChannelInterceptor {
                 )
                 return newMessage
             } else {
-                DarcyLogger.warn("$TAG 未知的消息类型 payload type: ${payload::class.java.simpleName}")
+                logW("$TAG 未知的消息类型 payload type: ${payload::class.java.simpleName}")
                 return message
             }
         } else {

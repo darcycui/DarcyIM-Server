@@ -4,6 +4,8 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.media.UploadFile
 import com.darcy.kotlin.server.demowebsocket.http.repository.FileRepository
 import com.darcy.kotlin.server.demowebsocket.http.repository.UploadFileRepository
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logI
+import com.darcy.kotlin.server.demowebsocket.log.logW
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -37,10 +39,10 @@ class UploadFileService @Autowired constructor(
     fun createItem(userId: Long, name: String, path: String, size: Long, type: Int, hash: String): UploadFile {
         val existItem = uploadFileRepository.findByHash(hash).firstOrNull()
         if (existItem != null) {
-            DarcyLogger.warn("数据库已存在:$name 无需写入数据库")
+            logW("数据库已存在:$name 无需写入数据库")
             return existItem
         }
-        DarcyLogger.info("数据库不存在:$name 写入数据库.")
+        logI("数据库不存在:$name 写入数据库.")
         return uploadFileRepository.save(
             UploadFile(
                 userId = userId,

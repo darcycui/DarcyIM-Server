@@ -6,6 +6,7 @@ import com.darcy.kotlin.server.demowebsocket.domain.table.message.MessageReadSta
 import com.darcy.kotlin.server.demowebsocket.domain.table.message.PrivateMessage
 import com.darcy.kotlin.server.demowebsocket.http.repository.MessageReadStatusRepository
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logI
 import com.darcy.kotlin.server.demowebsocket.utils.TimeUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -53,7 +54,7 @@ class MessageReadStatusService @Autowired constructor(
         if (msgIds.isEmpty()) return 0
         val readTime = LocalDateTime.now()
         val updatedCount = messageReadStatusRepository.receiverMarkMessagesAsRead(userId, msgIds, readTime)
-        DarcyLogger.info("批量标记消息已读: userId=$userId, count=$updatedCount")
+        logI("批量标记消息已读: userId=$userId, count=$updatedCount")
         return updatedCount
     }
 
@@ -95,7 +96,7 @@ class MessageReadStatusService @Autowired constructor(
         val targetId = input.targetId
         val page = (input.page ?: 1) - 1  // 客户端页码从1开始 服务端Page默认从0开始 这里需要转换索引
         val size = if (input.size in 1..100) input.size ?: 50 else 50
-        DarcyLogger.info("接收方离线同步 按未读状态查询: userId=$userId, targetId=$targetId, page=$page, size=$size")
+        logI("接收方离线同步 按未读状态查询: userId=$userId, targetId=$targetId, page=$page, size=$size")
         val unreadMsgIds = messageReadStatusRepository.findUnreadMsgIdsByConversation(userId, targetId)
         if (unreadMsgIds.isEmpty()) {
             return Page.empty(PageRequest.of(page, size))
@@ -116,7 +117,7 @@ class MessageReadStatusService @Autowired constructor(
         val page = (input.page ?: 1) - 1  // 客户端页码从1开始 服务端Page默认从0开始 这里需要转换索引
         val size = if (input.size in 1..100) input.size ?: 50 else 50
         val pageable = PageRequest.of(page, size)
-        DarcyLogger.info("接收方离线同步 按时间戳查询: userId=$userId, targetId=$targetId, page=$page, size=$size")
+        logI("接收方离线同步 按时间戳查询: userId=$userId, targetId=$targetId, page=$page, size=$size")
 
         val sinceTime = if (input.lastSyncTime?.isNotEmpty() == true) {
             TimeUtil.parseStringToDateTime(input.lastSyncTime)
@@ -126,7 +127,7 @@ class MessageReadStatusService @Autowired constructor(
         val messagesPage = privateMessageService.queryMessagesSinceTimestamp(
             userId, targetId, sinceTime, pageable
         )
-        DarcyLogger.info("离线同步完成: totalElements=${messagesPage.totalElements}, totalPages=${messagesPage.totalPages}, currentPage=${messagesPage.content.size}")
+        logI("离线同步完成: totalElements=${messagesPage.totalElements}, totalPages=${messagesPage.totalPages}, currentPage=${messagesPage.content.size}")
         return messagesPage
     }
 }

@@ -1,6 +1,8 @@
 package com.darcy.kotlin.server.demowebsocket.config.aop
 
 import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.log.logE
+import com.darcy.kotlin.server.demowebsocket.log.logI
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -33,8 +35,8 @@ class ControllerLoggingAspect {
         val methodName = "${signature.declaringType.simpleName}.${signature.name}"
 
         val requestHeaders = getRequestHeaders()
-        DarcyLogger.info("REQUEST: $methodName $methodName")
-        DarcyLogger.info("Headers: $requestHeaders")
+        logI("REQUEST: $methodName $methodName")
+        logI("Headers: $requestHeaders")
         val requestBody = if (shouldSkipRequestBody(joinPoint)) {
             "(skipped - contains special parameters)"
         } else {
@@ -42,22 +44,21 @@ class ControllerLoggingAspect {
         }
         val formParams = getFormParameters()
         if (formParams.isNotEmpty()) {
-            DarcyLogger.info("Form Params: $formParams")
+            logI("Form Params: $formParams")
         } else {
-            DarcyLogger.info("Body: $requestBody")
+            logI("Body: $requestBody")
         }
 
         return try {
             // 执行方法
             val result = joinPoint.proceed()
             // 记录响应结果
-            DarcyLogger.info(
-                "RESPONSE: $methodName | Result: {} | Time: {}ms",
-                formatJson(result), System.currentTimeMillis() - startTime
+            logI(
+                "RESPONSE: $methodName | Result: ${formatJson(result)} | Time: ${System.currentTimeMillis() - startTime}ms",
             )
             result
         } catch (e: Exception) {
-            DarcyLogger.error("ERROR in $methodName | {}", e.message)
+            logE("ERROR in $methodName | ${e.message}")
             throw e
         }
     }

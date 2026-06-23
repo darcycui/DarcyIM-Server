@@ -8,29 +8,29 @@
 //object SendHelper {
 //    fun sendPing(session: Session?) {
 //        try {
-//            DarcyLogger.info("Server sending ping...")
+//            logI("Server sending ping...")
 //            if (session?.isOpen != true) {
-//                DarcyLogger.info("Error: session is closed.")
+//                logI("Error: session is closed.")
 //                return
 //            }
 //            session.basicRemote?.sendText("ping")
 //        } catch (e: IOException) {
 //            e.printStackTrace()
-//            DarcyLogger.info("ping-->send message error: ${e.message}")
+//            logI("ping-->send message error: ${e.message}")
 //        }
 //    }
 //
 //    fun sendPong(session: Session?) {
 //        try {
-//            DarcyLogger.info("Server sending pong...")
+//            logI("Server sending pong...")
 //            if (session?.isOpen != true) {
-//                DarcyLogger.info("Error: session is closed.")
+//                logI("Error: session is closed.")
 //                return
 //            }
 //            session.basicRemote?.sendText("pong")
 //        } catch (e: IOException) {
 //            e.printStackTrace()
-//            DarcyLogger.info("pang-->send message error: ${e.message}")
+//            logI("pang-->send message error: ${e.message}")
 //        }
 //    }
 //
@@ -42,17 +42,17 @@
 //     */
 //    fun sendToPersonStr(message: String?, session: Session?) {
 //        try {
-//            DarcyLogger.info("发送文字给其他用户: $message")
+//            logI("发送文字给其他用户: $message")
 //            if (session?.isOpen != true) {
-//                DarcyLogger.info("Error: session is closed.")
+//                logI("Error: session is closed.")
 //                return
 //            }
 //            session.basicRemote?.sendText(message) ?: run {
-//                DarcyLogger.info("session is null")
+//                logI("session is null")
 //            }
 //        } catch (e: IOException) {
 //            e.printStackTrace()
-//            DarcyLogger.info("send message error: ${e.message}")
+//            logI("send message error: ${e.message}")
 //        }
 //    }
 //
