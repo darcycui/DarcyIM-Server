@@ -1,11 +1,9 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.out
 
-import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.ChaCha20TransportCipher
-import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
+import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.TransportCipherAESGCM
 import com.darcy.kotlin.server.demowebsocket.log.logI
 import com.darcy.kotlin.server.demowebsocket.log.logW
 import com.darcy.kotlin.server.demowebsocket.utils.bytesToHexStr
-import com.darcy.kotlin.server.demowebsocket.utils.hexStrToBytes
 import com.darcy.kotlin.server.demowebsocket.websocket_stomp.config.StompWebsocketConfig
 import org.springframework.messaging.Message
 import org.springframework.messaging.MessageChannel
@@ -13,7 +11,6 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 import org.springframework.messaging.support.ChannelInterceptor
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Component
-import java.nio.charset.Charset
 
 /**
  * Out拦截器 拦截服务器发出的消息
@@ -50,7 +47,7 @@ class OutEncryptInterceptor : ChannelInterceptor {
             logI("$TAG 出站消息（服务器发送到客户端）")
             // 加密私聊消息
             logI("$TAG 需要加密")
-            val encryptedPayload = ChaCha20TransportCipher.encrypt(
+            val encryptedPayload = TransportCipherAESGCM.encrypt(
                 userId = toUserId,
                 plaintext = payload,
                 aad = "WS:$url".toByteArray(),

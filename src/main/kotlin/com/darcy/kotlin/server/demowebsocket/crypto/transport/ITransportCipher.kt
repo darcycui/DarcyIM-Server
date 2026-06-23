@@ -1,8 +1,6 @@
 package com.darcy.kotlin.server.demowebsocket.crypto.transport
 
-import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.ChaCha20TransportCipher
 import com.darcy.kotlin.server.demowebsocket.utils.RandomUtil
-import java.security.SecureRandom
 
 // 定义传输加密解密的接口
 interface ITransportCipher {

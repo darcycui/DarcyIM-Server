@@ -3,9 +3,8 @@ package com.darcy.kotlin.server.demowebsocket.config.advice
 import com.darcy.kotlin.server.demowebsocket.config.jwt.JwtTokenProvider
 import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.ITransportCipher
-import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.ChaCha20TransportCipher
+import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.TransportCipherAESGCM
 import com.darcy.kotlin.server.demowebsocket.http.service.UserService
-import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.log.logD
 import com.darcy.kotlin.server.demowebsocket.log.logW
 import com.darcy.kotlin.server.demowebsocket.utils.JsonUtil
@@ -43,7 +42,7 @@ class EncryptResponseBodyAdvice @Autowired constructor(
         }
     }
 
-    private val transformCipher: ITransportCipher = ChaCha20TransportCipher
+    private val transportCipher: ITransportCipher = TransportCipherAESGCM
 
     override fun supports(
         returnType: MethodParameter,
@@ -86,7 +85,7 @@ class EncryptResponseBodyAdvice @Autowired constructor(
         logD("$TAG 原始响应body: $body")
 
         // 加密后返回加密字符串
-        val ciphertext = transformCipher.encrypt(
+        val ciphertext = transportCipher.encrypt(
             userId = userId,
             plaintext = json.toByteArray(),
             aad = "${realRequest.method}:${realRequest.uri.toString()}".toByteArray()

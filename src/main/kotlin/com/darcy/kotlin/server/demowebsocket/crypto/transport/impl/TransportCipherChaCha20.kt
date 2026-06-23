@@ -1,18 +1,17 @@
 package com.darcy.kotlin.server.demowebsocket.crypto.transport.impl
 
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.ITransportCipher
-import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.log.logD
 import com.darcy.kotlin.server.demowebsocket.log.logE
-import com.darcy.kotlin.server.demowebsocket.utils.hexStrToBytes
+import com.darcy.kotlin.server.demowebsocket.log.logI
 import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-object ChaCha20TransportCipher : ITransportCipher {
+object TransportCipherChaCha20 : ITransportCipher {
 
-    private val TAG = ChaCha20TransportCipher::class.simpleName
+    private val TAG = TransportCipherChaCha20::class.simpleName
     private const val ALGORITHM = "ChaCha20-Poly1305"
     private const val NONCE_SIZE_BYTES = 12 // ChaCha20 标准 Nonce 大小为 96位 (12字节)
 
@@ -86,7 +85,7 @@ object ChaCha20TransportCipher : ITransportCipher {
 
             // 4. 解密数据
             val data = cipher.doFinal(encryptedData)
-            logD("$TAG 解密后data: ${data.decodeToString()}")
+            logI("$TAG 解密后data: ${data.decodeToString()}")
             data
         }.onSuccess {
             logD("$TAG 解密成功.")

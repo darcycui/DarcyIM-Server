@@ -1,8 +1,7 @@
 package com.darcy.kotlin.server.demowebsocket.websocket_stomp.interceptor.`in`
 
-import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.ChaCha20TransportCipher
+import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.TransportCipherAESGCM
 import com.darcy.kotlin.server.demowebsocket.domain.dto.message.PrivateMessageDTO
-import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.log.logI
 import com.darcy.kotlin.server.demowebsocket.log.logW
 import com.darcy.kotlin.server.demowebsocket.utils.JsonUtil
@@ -15,7 +14,6 @@ import org.springframework.messaging.support.ChannelInterceptor
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.messaging.support.MessageHeaderAccessor
 import org.springframework.stereotype.Component
-import org.springframework.util.StringUtils
 import java.lang.Exception
 
 /**
@@ -54,7 +52,7 @@ class InDecryptInterceptor : ChannelInterceptor {
             logW("$TAG 入站消息（客户端发送到服务器）payload type: ${payload::class.java.simpleName}")
             if (payload is ByteArray) {
                 logI("$TAG 需要解密 fromUserId=$fromUserId")
-                val decryptedPayload = ChaCha20TransportCipher.decrypt(
+                val decryptedPayload = TransportCipherAESGCM.decrypt(
                     userId = fromUserId,
                     ciphertext = payload.decodeToString().hexStrToBytes(), // 密文是16进制字符串
                     aad = "WS:$url".toByteArray()

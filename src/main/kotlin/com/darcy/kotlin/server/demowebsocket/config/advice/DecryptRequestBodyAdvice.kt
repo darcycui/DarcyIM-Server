@@ -3,9 +3,8 @@ package com.darcy.kotlin.server.demowebsocket.config.advice
 import com.darcy.kotlin.server.demowebsocket.config.jwt.JwtTokenProvider
 import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.ITransportCipher
-import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.ChaCha20TransportCipher
+import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.TransportCipherAESGCM
 import com.darcy.kotlin.server.demowebsocket.http.service.UserService
-import com.darcy.kotlin.server.demowebsocket.log.DarcyLogger
 import com.darcy.kotlin.server.demowebsocket.log.logD
 import com.darcy.kotlin.server.demowebsocket.utils.TokenUtil
 import com.darcy.kotlin.server.demowebsocket.utils.hexStrToBytes
@@ -32,7 +31,7 @@ class DecryptRequestBodyAdvice @Autowired constructor(
         private val TAG = DecryptRequestBodyAdvice::class.java.simpleName
     }
 
-    private val transformCipher: ITransportCipher = ChaCha20TransportCipher
+    private val transportCipher: ITransportCipher = TransportCipherAESGCM
 
     override fun supports(
         methodParameter: MethodParameter,
@@ -71,7 +70,7 @@ class DecryptRequestBodyAdvice @Autowired constructor(
         val originalBody = inputMessage.body.readAllBytes()
         logD("$TAG 原始请求body: ${originalBody.decodeToString()}")
         val aad = "${servletRequest.method}:${servletRequest.requestURL}"
-        val decryptedBody = transformCipher.decrypt(
+        val decryptedBody = transportCipher.decrypt(
             userId = userId,
             ciphertext = originalBody.decodeToString().hexStrToBytes(), // 密文是16进制字符串
             aad = aad.toByteArray(StandardCharsets.UTF_8),

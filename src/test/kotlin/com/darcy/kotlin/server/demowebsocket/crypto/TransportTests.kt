@@ -1,7 +1,8 @@
 package com.darcy.kotlin.server.demowebsocket.crypto
 
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.TransportKeyManager
-import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.ChaCha20TransportCipher
+import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.TransportCipherChaCha20
+import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.TransportCipherAESGCM
 import com.darcy.kotlin.server.demowebsocket.http.service.DHService
 import com.darcy.kotlin.server.demowebsocket.utils.hexStrToBytes
 import org.junit.jupiter.api.Test
@@ -13,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.web.servlet.MockMvc
 import kotlin.test.assertContentEquals
-import kotlin.test.assertEquals
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -66,10 +66,10 @@ class TransportTests {
         val nonce = "1234567890ab".toByteArray()
         val aad = "additional data".toByteArray()
 
-        val encrypted = ChaCha20TransportCipher.encrypt(1, message, key, nonce, aad)
+        val encrypted = TransportCipherChaCha20.encrypt(1, message, key, nonce, aad)
         println("encrypted: ${encrypted.toHexString()}")
 
-        val decrypted = ChaCha20TransportCipher.decrypt(1, encrypted, key, aad)
+        val decrypted = TransportCipherChaCha20.decrypt(1, encrypted, key, aad)
         println("decrypted: ${decrypted.toHexString()}")
 
         assertContentEquals(message, decrypted, "ChaCha20-Poly1305 加密解密失败")
@@ -82,7 +82,27 @@ class TransportTests {
         val key = "1234567890abcdef1234567890abcdef".toByteArray()
         val nonce = "1234567890ab".toByteArray()
         val aad = "additional data".toByteArray()
-        val deprecated = ChaCha20TransportCipher.decrypt(1, requestStr.hexStrToBytes(), key, aad)
+        val deprecated = TransportCipherChaCha20.decrypt(1, requestStr.hexStrToBytes(), key, aad)
         println("deprecated: ${deprecated.decodeToString()}") // 68656c6c6f20776f726c64 "hello world"
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    @Test
+    fun `test-aes-gcm-cipher-crypto`() {
+        val originalKey = "1234567890abcdef1234567890abcdef".toByteArray()
+        val userId = 100L
+        keyManager.setTransportKey(userId, originalKey)
+        val key = keyManager.getTransportKey(userId)
+        println("key: ${key.toHexString()}")
+        val message = "hello world".toByteArray()
+        println("message: ${message.toHexString()}")
+        val nonce = "1234567890ab".toByteArray()
+        val aad = "additional data".toByteArray()
+        val encrypted = TransportCipherAESGCM.encrypt(userId, message, key, nonce, aad)
+        println("encrypted: ${encrypted.toHexString()}")
+        val decrypted = TransportCipherAESGCM.decrypt(userId, encrypted, key, aad)
+        println("decrypted: ${decrypted.toHexString()}")
+        assertContentEquals(message, decrypted, "AES-GCM 加密解密失败")
+
     }
 }
