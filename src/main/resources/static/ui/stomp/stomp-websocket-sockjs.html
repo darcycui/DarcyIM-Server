@@ -79,7 +79,7 @@
         const token = tokenInput.value.trim();
         const baseUrl = serverInput.value.trim().replace(/\/+$/, '');
 
-        const socket = new SockJS(`${baseUrl}/stomp-ws`, null, {
+        const socket = new SockJS(`${baseUrl}/stomp-sockjs`, null, {
             transports: ['websocket', 'xhr-polling']
         });
         stompClient = Stomp.over(socket);

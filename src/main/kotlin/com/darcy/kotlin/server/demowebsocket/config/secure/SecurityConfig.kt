@@ -43,8 +43,8 @@ class SecurityConfig {
                     "/api/login",
                     "/api/register",
                     "/api/**",
-//                    "/stomp-ws/**",
-//                    "/stomp-sockjs/**",
+                    "/stomp-ws/**",  // 放行websocket连接
+                    "/stomp-sockjs/**",
                     "/js/**",
                     "/error/**",
                 ).permitAll()
@@ -52,6 +52,7 @@ class SecurityConfig {
             }
             // 使用 httpBasic 认证
 //            .httpBasic {}
+            .cors{}  // 允许跨域 使用[WebMvcConfig#addCorsMappings()]的配置
             .csrf {
                 // 通常API 禁用CSRF
                 it.disable()
