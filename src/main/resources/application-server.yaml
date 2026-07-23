@@ -15,16 +15,15 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:mysql://localhost:3306/mydatabase?useSSL=false&serverTimezone=Asia/Shanghai&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
-#    password: 123456
-    password: 123456@123
+    url: jdbc:mysql://mysql:3306/mydatabase?useSSL=false&serverTimezone=Asia/Shanghai&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
+    password: root
     username: root
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: false  #控制台显示SQL
     hibernate.ddl-auto: update #更新或者创建数据表结构
   flyway:
-    enabled: true              # 开启 Flyway
+    enabled: false              # 不开启 Flyway
     baseline-on-migrate: true  # 允许在已有数据库上基线迁移
     baseline-version: 1.0.0    # 基线版本 低于此版本号不会迁移
     clean-disabled: true       # 生产环境严禁开启 clean

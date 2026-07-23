@@ -10,7 +10,7 @@ data class RegisterRequestDTO(
     val username: String,
 
     @field:NotBlank(message = "密码不能为空")
-    @field:Size(min = 64, max = 64, message = "密码长度必须在6-20个字符之间")
+    @field:Size(min = 6, max = 20, message = "密码长度必须在6-20个字符之间")
     val password: String,
 
     @field:NotBlank(message = "昵称不能为空")
@@ -19,7 +19,7 @@ data class RegisterRequestDTO(
     @field:NotBlank(message = "头像不能为空")
     val avatar: String = "",
 
-    @field:NotBlank(message = "性别不能为空")
+    @field:NotBlank(message = "电话不能为空")
     val phone: String = "",
 
     @field:NotBlank(message = "邮箱不能为空")

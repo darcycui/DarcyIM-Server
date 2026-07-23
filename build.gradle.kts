@@ -20,7 +20,7 @@ allOpen {
 }
 
 group = "com.darcy.kotlin.server"
-version = "0.0.4-SNAPSHOT"
+version = "0.0.8"
 
 java {
     toolchain {
@@ -79,8 +79,8 @@ dependencies {
     // 添加 Spring AOP 依赖
     implementation("org.springframework.boot:spring-boot-starter-aop")
     // 添加 Flyway 用于数据库升级
-    implementation("org.flywaydb:flyway-core:10.22.0")
-    implementation("org.flywaydb:flyway-mysql:10.22.0")
+    implementation("org.flywaydb:flyway-core:12.0.0")
+    implementation("org.flywaydb:flyway-mysql:12.0.0")
     // 添加 Springboot Validation 依赖
     implementation("org.springframework.boot:spring-boot-starter-validation")
 

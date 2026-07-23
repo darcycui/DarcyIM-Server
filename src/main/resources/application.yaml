@@ -23,12 +23,13 @@ server:
 
 spring:
   profiles:
-    active: dev  # 激活开发环境
+#    active: dev  # 激活开发环境
+    active: server  # 激活 server 环境
   main:
     allow-bean-definition-overriding: true
   datasource:
     url: jdbc:mysql://localhost:3306/mydatabase?useSSL=false&serverTimezone=Asia/Shanghai&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
-    password: 123456
+    password: 123456@123
     username: root
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
