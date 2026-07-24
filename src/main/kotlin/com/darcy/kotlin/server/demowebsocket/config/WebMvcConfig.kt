@@ -21,13 +21,7 @@ class WebMvcConfig : WebMvcConfigurer {
     }
 
     override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/**") // 匹配所有路径
-//            .allowedOrigins("*")// 生产环境应指定具体域名
-            .allowedOriginPatterns("*", "null")
-            .allowedMethods("*") // 允许的方法
-            .allowedHeaders("*") // 允许的头信息
-            .allowCredentials(true) // 是否允许携带 Cookie
-            .maxAge(30) // 预检请求的有效期（秒）
+        // CORS 由 SecurityConfig 处理，此处不做配置以避免冲突
     }
 
     override fun configureMessageConverters(converters: MutableList<HttpMessageConverter<*>>) {
