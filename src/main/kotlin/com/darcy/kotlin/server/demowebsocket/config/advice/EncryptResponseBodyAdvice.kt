@@ -84,11 +84,12 @@ class EncryptResponseBodyAdvice @Autowired constructor(
         val json = JsonUtil.toJson(body)
         logD("$TAG 原始响应body: $body")
 
-        // 加密后返回加密字符串
+        val plainUri = "${realRequest.method}:${realRequest.uri.path}"
+        logD("$TAG 加密AAD: $plainUri")
         val ciphertext = transportCipher.encrypt(
             userId = userId,
             plaintext = json.toByteArray(),
-            aad = "${realRequest.method}:${realRequest.uri.toString()}".toByteArray()
+            aad = plainUri.toByteArray()
         ).bytesToHexStr()
         logD("$TAG 加密后响应body: $ciphertext")
         return ciphertext

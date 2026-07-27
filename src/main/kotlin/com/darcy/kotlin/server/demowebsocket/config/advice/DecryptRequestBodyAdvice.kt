@@ -69,7 +69,7 @@ class DecryptRequestBodyAdvice @Autowired constructor(
         // 读取原始请求体并解密
         val originalBody = inputMessage.body.readAllBytes()
         logD("$TAG 原始请求body: ${originalBody.decodeToString()}")
-        val aad = "${servletRequest.method}:${servletRequest.requestURL}"
+        val aad = "${servletRequest.method}:${servletRequest.requestURI}"
         val decryptedBody = transportCipher.decrypt(
             userId = userId,
             ciphertext = originalBody.decodeToString().hexStrToBytes(), // 密文是16进制字符串
