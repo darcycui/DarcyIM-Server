@@ -4,6 +4,7 @@ import com.darcy.kotlin.server.demowebsocket.config.jwt.JwtTokenProvider
 import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.ITransportCipher
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.TransportCipherAESGCM
+import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.service.UserService
 import com.darcy.kotlin.server.demowebsocket.log.logD
 import com.darcy.kotlin.server.demowebsocket.utils.TokenUtil
@@ -63,8 +64,14 @@ class DecryptRequestBodyAdvice @Autowired constructor(
             logD("$TAG 请求未加密，不进行解密")
             return inputMessage
         }
-        val token = servletRequest.getHeader(TokenUtil.TOKEN_HEADER)
-        val username = tokenProvider.getUsernameFromJWT(TokenUtil.cutOnlyToken(token))
+        val bearerToken = servletRequest.getHeader(TokenUtil.TOKEN_HEADER) ?: ""
+        val username = tokenProvider.getUsernameFromJWT(TokenUtil.cutOnlyToken(bearerToken))
+        if (username.isBlank()) {
+            throw UserException(110, "未登录或token已过期")
+        }
+        if (!userService.isUserExistByName(username)) {
+            throw UserException.USER_NOT_EXIST
+        }
         val userId = userService.queryUserByUsername(username).id
         // 读取原始请求体并解密
         val originalBody = inputMessage.body.readAllBytes()

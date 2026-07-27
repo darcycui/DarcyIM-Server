@@ -4,6 +4,7 @@ import com.darcy.kotlin.server.demowebsocket.config.jwt.JwtTokenProvider
 import com.darcy.kotlin.server.demowebsocket.crypto.annotation.Encrypted
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.ITransportCipher
 import com.darcy.kotlin.server.demowebsocket.crypto.transport.impl.TransportCipherAESGCM
+import com.darcy.kotlin.server.demowebsocket.exception.code100.UserException
 import com.darcy.kotlin.server.demowebsocket.http.service.UserService
 import com.darcy.kotlin.server.demowebsocket.log.logD
 import com.darcy.kotlin.server.demowebsocket.log.logW
@@ -77,8 +78,16 @@ class EncryptResponseBodyAdvice @Autowired constructor(
             return body
         }
         val realRequest = (request as ServletServerHttpRequest)
-        val token = realRequest.servletRequest.getHeader(TokenUtil.TOKEN_HEADER)
-        val username = tokenProvider.getUsernameFromJWT(TokenUtil.cutOnlyToken(token))
+        val bearerToken = realRequest.servletRequest.getHeader(TokenUtil.TOKEN_HEADER) ?: ""
+        val username = tokenProvider.getUsernameFromJWT(TokenUtil.cutOnlyToken(bearerToken))
+        if (username.isBlank()) {
+            logW("$TAG 用户未登录，不进行响应加密")
+            return body
+        }
+        if (!userService.isUserExistByName(username)) {
+            logW("$TAG 用户不存在，不进行响应加密")
+            return body
+        }
         val userId = userService.queryUserByUsername(username).id
         // 将响应对象转为 JSON 字符串
         val json = JsonUtil.toJson(body)
