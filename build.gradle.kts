@@ -20,7 +20,7 @@ allOpen {
 }
 
 group = "com.darcy.kotlin.server"
-version = "0.0.9"
+version = "0.1.0"
 
 java {
     toolchain {
