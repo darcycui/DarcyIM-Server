@@ -1,4 +1,4 @@
-rootProject.name = "demo-websocket"
+rootProject.name = "DarcyIM-Server"
 pluginManagement {
     repositories {
         maven ("https://maven.aliyun.com/repository/public")
